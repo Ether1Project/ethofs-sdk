@@ -1,4 +1,4 @@
-<img src="https://ethofs.com/index/images/logo.png" width="200" />
+```<img src="https://ethofs.com/index/images/logo.png" width="200" />```
 
 # ethoFS SDK
 

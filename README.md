@@ -1,6 +1,7 @@
-<div class="bg-gray">
-<img src="https://ethofs.com/index/images/logo.png" width="200" />```
+<div class="bg-gray-dark">
+<img src="https://ethofs.com/index/images/logo.png" width="200" />
 </div>
+
 # ethoFS SDK
 
 Official NodeJS SDK for [ethoFS](https://ethofs.com)

@@ -5,7 +5,7 @@ const path = require('path');
 const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
 
-let libraryName = 'pinata-sdk';
+let libraryName = 'ethofs-sdk';
 
 let outputFile, mode;
 

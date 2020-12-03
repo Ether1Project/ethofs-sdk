@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { baseUrl } from './../../constants';
-import { validateApiKeys, validateMetadata } from '../../util/validators';
+import { validateEthofsKey, validateMetadata } from '../../util/validators';
 import isIPFS from 'is-ipfs';
 
-export default function hashMetadata(pinataApiKey, pinataSecretApiKey, ipfsPinHash, metadata) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function hashMetadata(ethofsKey, ipfsPinHash, metadata) {
+    validateEthofsKey(ethofsKey);
 
     if (!ipfsPinHash) {
         throw new Error('ipfsPinHash value is required for changing the pin policy of a pin');
@@ -40,8 +40,7 @@ export default function hashMetadata(pinataApiKey, pinataSecretApiKey, ipfsPinHa
             {
                 withCredentials: true,
                 headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

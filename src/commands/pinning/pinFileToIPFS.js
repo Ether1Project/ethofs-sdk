@@ -4,8 +4,8 @@ import NodeFormData from 'form-data';
 import stream from 'stream';
 import {validateApiKeys, validateMetadata, validatePinataOptions} from '../../util/validators';
 
-export default function pinFileToIPFS(pinataApiKey, pinataSecretApiKey, readStream, options) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function pinFileToIPFS(ethofsKey, readStream, options) {
+    validateEthofsKey(ethofsKey);
 
     return new Promise((resolve, reject) => {
 
@@ -20,13 +20,13 @@ export default function pinFileToIPFS(pinataApiKey, pinataSecretApiKey, readStre
         }
 
         if (options) {
-            if (options.pinataMetadata) {
-                validateMetadata(options.pinataMetadata);
-                data.append('pinataMetadata', JSON.stringify(options.pinataMetadata));
+            if (options.ethofsMetadata) {
+                validateMetadata(options.ethofsMetadata);
+                data.append('ethofsMetadata', JSON.stringify(options.ethofsMetadata));
             }
-            if (options.pinataOptions) {
-                validatePinataOptions(options.pinataOptions);
-                data.append('pinataOptions', JSON.stringify(options.pinataOptions));
+            if (options.ethofsOptions) {
+                validateethofsOptions(options.ethofsOptions);
+                data.append('ethofsOptions', JSON.stringify(options.ethofsOptions));
             }
         }
 
@@ -38,8 +38,7 @@ export default function pinFileToIPFS(pinataApiKey, pinataSecretApiKey, readStre
                 maxContentLength: 'Infinity', //this is needed to prevent axios from erroring out with large files
                 headers: {
                     'Content-type': `multipart/form-data; boundary= ${data._boundary}`,
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

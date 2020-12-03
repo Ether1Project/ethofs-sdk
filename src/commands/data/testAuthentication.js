@@ -1,35 +1,38 @@
 import axios from 'axios';
-import { baseUrl } from './../../constants';
+import { baseUrl, controllerContractAddress, controllerABI } from './../../constants';
 import {validateApiKeys} from '../../util/validators';
 
-export default function testAuthentication(pinataApiKey, pinataSecretApiKey) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
-
+export default function testAuthentication(ethofsKey) {
+    validateEthofsKey(ethofsKey);
+    
     //  test authentication to make sure that the user's provided keys are legit
-    const endpoint = `${baseUrl}/data/testAuthentication`;
+    const endpoint = `${baseUrl}`;
 
     return new Promise((resolve, reject) => {
-        axios.get(
-            endpoint,
-            {
-                withCredentials: true,
-                headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
-                }
-            }).then(function (result) {
-            if (result.status !== 200) {
-                reject(new Error(`unknown server response while authenticating: ${result}`));
-            }
-            resolve({
-                authenticated: true
+        var web3 = new Web3(endpoint);
+        web3.eth.net.isListening()
+            .then(function() {
+                let account = web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
+                web3.eth.accounts.wallet.add(account)
+                web3.eth.defaultAccount = account.address
+            
+                var ethoFSAccounts = new web3.eth.Contract(GlobalControllerABI, GlobalControllerContractAddress);            
+                ethoFSAccounts.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function(error, result) {
+                    if (!error) {
+                        if (result) {
+                            console.log("ethoFS User Found");
+                            resolve({
+                                authenticated: true
+                            });
+                        } else {
+                            console.log("ethoFS User Not Found");
+                            reject(new Error(`ethoFS User Not Found`));
+                        }
+                    } else {
+                        console.log("Ether-1 RPC Access Error");
+                        reject(new Error(`Ether-1 RPC Access Error: ${error}`));
+                    }
+                });
             });
-        }).catch(function (error) {
-            if (error && error.response && error.response && error.response.data && error.response.data.error) {
-                reject(new Error(error.response.data.error));
-            } else {
-                reject(error);
-            }
-        });
     });
 };

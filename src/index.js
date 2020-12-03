@@ -11,45 +11,39 @@ import testAuthentication from './commands/data/testAuthentication';
 import pinList from './commands/data/pinList/pinList';
 import userPinnedDataTotal from './commands/data/userPinnedDataTotal';
 
-export default function pinataClient(pinataApiKey, pinataSecretApiKey) {
+export default function pinataClient(ethofsKey) {
     let client = {};
 
     //  setting up the actual calls you can make using this package
     client.pinByHash = function (hashToPin, options) {
-        return pinByHash(pinataApiKey, pinataSecretApiKey, hashToPin, options);
+        return pinByHash(ethofsKey, hashToPin, options);
     };
     client.hashMetadata = function (ipfsPinHash, metadata) {
-        return hashMetadata(pinataApiKey, pinataSecretApiKey, ipfsPinHash, metadata);
-    };
-    client.hashPinPolicy = function (ipfsPinHash, newPinPolicy) {
-        return hashPinPolicy(pinataApiKey, pinataSecretApiKey, ipfsPinHash, newPinPolicy);
+        return hashMetadata(ethofsKey, ipfsPinHash, metadata);
     };
     client.pinFileToIPFS = function (readableStream, options) {
-        return pinFileToIPFS(pinataApiKey, pinataSecretApiKey, readableStream, options);
+        return pinFileToIPFS(ethofsKey, readableStream, options);
     };
     client.pinFromFS = function (sourcePath, options) {
-        return pinFromFS(pinataApiKey, pinataSecretApiKey, sourcePath, options);
+        return pinFromFS(ethofsKey, sourcePath, options);
     };
     client.pinJSONToIPFS = function (body, options) {
-        return pinJSONToIPFS(pinataApiKey, pinataSecretApiKey, body, options);
+        return pinJSONToIPFS(ethofsKey, body, options);
     };
     client.pinJobs = function (filters) {
-        return pinJobs(pinataApiKey, pinataSecretApiKey, filters);
+        return pinJobs(ethofsKey, filters);
     };
     client.unpin = function (hashToUnpin) {
-        return unpin(pinataApiKey, pinataSecretApiKey, hashToUnpin);
-    };
-    client.userPinPolicy = function (newPinPolicy) {
-        return userPinPolicy(pinataApiKey, pinataSecretApiKey, newPinPolicy);
+        return unpin(ethofsKey, hashToUnpin);
     };
     client.testAuthentication = function () {
-        return testAuthentication(pinataApiKey, pinataSecretApiKey);
+        return testAuthentication(ethofsKey);
     };
     client.pinList = function (filters) {
-        return pinList(pinataApiKey, pinataSecretApiKey, filters);
+        return pinList(ethofsKey, filters);
     };
     client.userPinnedDataTotal = function () {
-        return userPinnedDataTotal(pinataApiKey, pinataSecretApiKey);
+        return userPinnedDataTotal(ethofsKey);
     };
     return client;
 }

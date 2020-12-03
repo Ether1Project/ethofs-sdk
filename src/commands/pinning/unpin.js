@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { baseUrl } from './../../constants';
-import { validateApiKeys } from '../../util/validators';
+import { validateEthofsKeys } from '../../util/validators';
 import isIPFS from 'is-ipfs';
 
-export default function unpin(pinataApiKey, pinataSecretApiKey, hashToUnpin) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function unpin(ethofsKey, hashToUnpin) {
+    validateEthofsKey(ethofsKey);
 
     if (!hashToUnpin) {
-        throw new Error('hashToUnpin value is required for removing a pin from Pinata');
+        throw new Error('hashToUnpin value is required for removing a pin from ethoFS');
     }
     if (!isIPFS.cid(hashToUnpin)) {
         throw new Error(`${hashToUnpin} is an invalid IPFS CID`);
@@ -21,8 +21,7 @@ export default function unpin(pinataApiKey, pinataSecretApiKey, hashToUnpin) {
             {
                 withCredentials: true,
                 headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

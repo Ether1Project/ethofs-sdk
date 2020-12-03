@@ -7,7 +7,7 @@ const fs = require('fs');
 const recursive = require('recursive-fs');
 
 export default function pinFromFS(ethofsKey, sourcePath, options) {
-    validateApiKeys(ethofsKey);
+    validateEthofsKeys(ethofsKey);
 
     return new Promise((resolve, reject) => {
         const endpoint = `${baseUrl}/pinning/pinFileToIPFS`;

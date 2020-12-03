@@ -1,1 +1,1 @@
-export const baseUrl = 'https://api.pinata.cloud';
+export const baseUrl = 'https://rpc.ether1.org';

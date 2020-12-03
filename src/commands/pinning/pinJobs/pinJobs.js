@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { baseUrl } from './../../../constants';
-import { validateApiKeys } from '../../../util/validators';
+import { validateEthofsKey } from '../../../util/validators';
 import queryBuilder from './queryBuilder';
 
-export default function pinJobs(pinataApiKey, pinataSecretApiKey, filters) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function pinJobs(ethofsKey, filters) {
+    validateEthofsKey(ethofsKey);
 
     let endpoint = `${baseUrl}/pinning/pinJobs`;
 
@@ -18,8 +18,7 @@ export default function pinJobs(pinataApiKey, pinataSecretApiKey, filters) {
             {
                 withCredentials: true,
                 headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

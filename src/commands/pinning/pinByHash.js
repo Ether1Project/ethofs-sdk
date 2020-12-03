@@ -3,8 +3,8 @@ import { baseUrl } from './../../constants';
 import { validateApiKeys, validateMetadata } from '../../util/validators';
 import isIPFS from 'is-ipfs';
 
-export default function pinByHash(pinataApiKey, pinataSecretApiKey, hashToPin, options) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function pinByHash(ethofsKey, hashToPin, options) {
+    validateEthofsKey(ethofsKey);
 
     if (!hashToPin) {
         throw new Error('hashToPin value is required for pinning by hash');
@@ -16,16 +16,16 @@ export default function pinByHash(pinataApiKey, pinataSecretApiKey, hashToPin, o
     const endpoint = `${baseUrl}/pinning/pinByHash`;
     const body = {
         hashToPin: hashToPin,
-        pinataOptions: {}
+        ethofsOptions: {}
     };
 
     if (options) {
-        if (options.pinataOptions) {
-            body.pinataOptions = options.pinataOptions;
+        if (options.ethofsOptions) {
+            body.ethofsOptions = options.ethofsOptions;
         }
-        if (options.pinataMetadata) {
-            validateMetadata(options.pinataMetadata);
-            body.pinataMetadata = options.pinataMetadata;
+        if (options.ethofsMetadata) {
+            validateMetadata(options.ethofsMetadata);
+            body.ethofsMetadata = options.ethofsMetadata;
         }
     }
 
@@ -36,8 +36,7 @@ export default function pinByHash(pinataApiKey, pinataSecretApiKey, hashToPin, o
             {
                 withCredentials: true,
                 headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

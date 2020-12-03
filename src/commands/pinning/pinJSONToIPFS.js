@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { baseUrl } from './../../constants';
-import { validateApiKeys, validateMetadata, validatePinataOptions } from '../../util/validators';
+import { validateEthofsKey, validateMetadata, validateEthofsOptions } from '../../util/validators';
 
-export default function pinJSONToIPFS(pinataApiKey, pinataSecretApiKey, body, options) {
-    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+export default function pinJSONToIPFS(ethofsKey, body, options) {
+    validateEthofsKey(ethofsKey);
 
     let requestBody = body;
 
@@ -13,15 +13,15 @@ export default function pinJSONToIPFS(pinataApiKey, pinataSecretApiKey, body, op
 
     if (options) {
         requestBody = {
-            pinataContent: body
+            ethofsContent: body
         };
-        if (options.pinataMetadata) {
-            validateMetadata(options.pinataMetadata);
-            requestBody.pinataMetadata = options.pinataMetadata;
+        if (options.ethofsMetadata) {
+            validateMetadata(options.ethofsMetadata);
+            requestBody.ethofsMetadata = options.ethofsMetadata;
         }
-        if (options.pinataOptions) {
-            validatePinataOptions(options.pinataOptions);
-            requestBody.pinataOptions = options.pinataOptions;
+        if (options.ethofsOptions) {
+            validateEthofsOptions(options.ethofsOptions);
+            requestBody.ethofsOptions = options.ethofsOptions;
         }
     }
 
@@ -34,8 +34,7 @@ export default function pinJSONToIPFS(pinataApiKey, pinataSecretApiKey, body, op
             {
                 withCredentials: true,
                 headers: {
-                    'pinata_api_key': pinataApiKey,
-                    'pinata_secret_api_key': pinataSecretApiKey
+                    'ethofs_key': ethofsKey
                 }
             }).then(function (result) {
             if (result.status !== 200) {

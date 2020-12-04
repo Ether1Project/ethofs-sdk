@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { baseUrl } from './../../constants';
-import { validateEthofsKeys } from '../../util/validators';
+import { validateEthofsKey } from '../../util/validators';
 import isIPFS from 'is-ipfs';
 
 export default function unpin(ethofsKey, hashToUnpin) {

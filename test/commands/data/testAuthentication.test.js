@@ -1,17 +1,9 @@
-import axios from 'axios';
 import testAuthentication from'../../../src/commands/data/testAuthentication';
 
-jest.mock('axios');
-
-test('Result other than 200 status is returned', () => {
-    const badStatus = {
-        status: 700
-    };
-    axios.get.mockResolvedValue(badStatus);
-    expect.assertions(1);
-    return expect(testAuthentication('test', 'test')).rejects.toEqual(Error(`unknown server response while authenticating: ${badStatus}`));
+test('Result of ethoFS user not found', () => {
+    return expect(testAuthentication('000000000000000000000000000000000000000000000000000000000000000a')).rejects.toEqual(Error('ethoFS User Not Found'));
 });
-
+/*
 test('200 status is returned', () => {
     const goodStatus = {
         status: 200
@@ -28,3 +20,4 @@ test('Rejection handled', () => {
     expect.assertions(1);
     return expect(testAuthentication('test', 'test')).rejects.toEqual('test error');
 });
+*/

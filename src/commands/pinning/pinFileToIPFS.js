@@ -2,7 +2,7 @@ import axios from 'axios';
 import { baseUrl } from './../../constants';
 import NodeFormData from 'form-data';
 import stream from 'stream';
-import {validateApiKeys, validateMetadata, validatePinataOptions} from '../../util/validators';
+import {validateEthofsKey, validateMetadata, validateEthofsOptions} from '../../util/validators';
 
 export default function pinFileToIPFS(ethofsKey, readStream, options) {
     validateEthofsKey(ethofsKey);
@@ -25,7 +25,7 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
                 data.append('ethofsMetadata', JSON.stringify(options.ethofsMetadata));
             }
             if (options.ethofsOptions) {
-                validateethofsOptions(options.ethofsOptions);
+                validateEthofsOptions(options.ethofsOptions);
                 data.append('ethofsOptions', JSON.stringify(options.ethofsOptions));
             }
         }

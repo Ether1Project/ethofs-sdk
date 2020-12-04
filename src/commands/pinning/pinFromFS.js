@@ -7,7 +7,7 @@ const fs = require('fs');
 const recursive = require('recursive-fs');
 
 export default function pinFromFS(ethofsKey, sourcePath, options) {
-    validateEthofsKeys(ethofsKey);
+    validateEthofsKey(ethofsKey);
 
     return new Promise((resolve, reject) => {
         const endpoint = `${baseUrl}/pinning/pinFileToIPFS`;
@@ -27,7 +27,7 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
                         validateMetadata(options.ethofsMetadata);
                         data.append('ethofsMetadata', JSON.stringify(options.ethofsMetadata));
                     }
-                    if (options.pinataOptions) {
+                    if (options.ethofsOptions) {
                         validateEthofsOptions(options.ethofsOptions);
                         data.append('ethofsOptions', JSON.stringify(options.ethofsOptions));
                     }

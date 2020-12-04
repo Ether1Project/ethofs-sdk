@@ -1,5 +1,3 @@
-import isIPFS from 'is-ipfs';
-
 export function validateEthofsKey(ethofsKey) {
     if (!ethofsKey || ethofsKey === '') {
         throw new Error('No ethoFS private key provided! Please provide your ethoFS private key as an argument when you start this script');

@@ -180,7 +180,7 @@ const options = {
             customKey2: 'customValue2'
         }
     },
-    pinataOptions: {
+    ethofsOptions: {
         cidVersion: 0
     }
 };
@@ -246,7 +246,7 @@ Send JSON to to ethoFS for direct pinning to IPFS.
 * `body` - Valid JSON you wish to pin to IPFS
 * `options` (optional): A JSON object that can contain the following keyvalues:
   * `metadata` (optional): A JSON object with [optional metadata](#metadata-anchor) for the hash being pinned
-  * `pinataOptions` (optional): A JSON object with additional [options](#metadata-anchor) for the JSON being pinned
+  * `ethofsOptions` (optional): A JSON object with additional [options](#metadata-anchor) for the JSON being pinned
 #### Response
 ```
 {
@@ -287,7 +287,7 @@ Have ethoFS unpin content that you've pinned through the service.
 
 ##### `ethofs.unpin(hashToUnpin)`
 ##### Params
-* `hashToUnpin` - the hash of the content you wish to unpin from Pinata
+* `hashToUnpin` - the hash of the content you wish to unpin from ethoFS
 #### Response
 If the operation is successful, you will simply receive "OK" as your result
 ##### Example Code
@@ -347,7 +347,7 @@ Retrieve pin records for your ethoFS account
     * `'unpinned'` (Only records for unpinned content will be returned)
   * `pageLimit` (optional): Limit the amount of results returned per page of results (default is 10, and max is 1000)
   * `pageOffset` (optional): Provide the record offset for records being returned. This is how you retrieve records on additional pages (default is 0)
-   * `metadata` (optional): A JSON object that can be used to find records for content that had optional metadata included when it was added to Pinata. The metadata object is formatted as follows:
+   * `metadata` (optional): A JSON object that can be used to find records for content that had optional metadata included when it was added to ethoFS. The metadata object is formatted as follows:
  
 ##### Metadata filter object formatting
 ```
@@ -416,7 +416,7 @@ As an example, the following filter would only find records whose name contains 
             size: (this is how large (in bytes) the content pinned is),
             user_id: (this is your user id for ethoFS),
             date_pinned: (This is the timestamp for when this content was pinned - represented in ISO 8601 format),
-            date_unpinned: (This is the timestamp for when this content was unpinned (if null, then you still have the content pinned on Pinata),
+            date_unpinned: (This is the timestamp for when this content was unpinned (if null, then you still have the content pinned on ethoFS),
             metadata: {
                 name: (this will be the name of the file originally upuloaded, or the custom name you set),
                 keyvalues: {
@@ -512,7 +512,7 @@ The metadata object can consist of the following values:
 <a name="ethofsOptions-anchor"></a>
 
 ## ethoFS Options
-Some endpoints allow you to pass additional options for Pinata to take into account when adding content to IPFS.
+Some endpoints allow you to pass additional options for ethoFS to take into account when adding content to IPFS.
 
 The options object can consist of the following values:
 * cidVerson (optional) - The [CID version](https://github.com/multiformats/cid#versions) IPFS will use when creating a hash for your content. Valid options are:

@@ -74,7 +74,7 @@ const fs = require('fs');
 const readableStreamForFile = fs.createReadStream('./yourfile.png');
 const options = {
     ethofsData: {
-        name: MyCustomUploadName,
+        name: 'MyCustomUploadName',
         keyvalues: {
             customKey: 'customValue',
             customKey2: 'customValue2'

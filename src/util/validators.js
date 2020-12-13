@@ -4,27 +4,27 @@ export function validateEthofsKey(ethofsKey) {
     }
 }
 
-export function validateMetadata(metadata) {
-    if (metadata.name) {
-        if (!(typeof metadata.name === 'string' || metadata.name instanceof String)) {
-            throw new Error('metadata name must be of type string');
+export function validateEthofsData(data) {
+    if (data.name) {
+        if (!(typeof data.name === 'string' || data.name instanceof String)) {
+            throw new Error('ethofsData name must be of type string');
         }
     }
 
-    if (metadata.keyvalues) {
-        if (!(typeof metadata.keyvalues === 'object')) {
-            throw new Error('metatadata keyvalues must be an object');
+    if (data.keyvalues) {
+        if (!(typeof data.keyvalues === 'object')) {
+            throw new Error('ethofsData keyvalues must be an object');
         }
 
         let i = 0;
 
-        Object.entries(metadata.keyvalues).forEach(function (keyValue) {
+        Object.entries(data.keyvalues).forEach(function (keyValue) {
             if (i > 9) {
-                throw new Error('No more than 10 keyvalues can be provided for metadata entries');
+                throw new Error('No more than 10 keyvalues can be provided for ethofsData entries');
             }
             //  we want to make sure that the input is a string, a boolean, or a number, so we don't get an object passed in by accident
             if (!(typeof keyValue[1] === 'string' || typeof keyValue[1] === 'boolean' || !isNaN(keyValue[1]))) {
-                throw new Error('Metadata keyvalue values must be strings, booleans, or numbers');
+                throw new Error('EthofsData keyvalue values must be strings, booleans, or numbers');
             }
             i++;
         });
@@ -36,7 +36,13 @@ export function validateEthofsOptions(options) {
         throw new Error('options must be an object');
     }
 
-    if (options.cidVersion) {
+    if (options.hostingContractDuration) {
+        if (options.hostingContractDuration < 100000 || typeof options.hostingContractDuration !== 'number') {
+            throw new Error('incorrect hosting contract duration');
+        }
+    }
+
+/*    if (options.cidVersion) {
         // eslint-disable-next-line eqeqeq
         if (options.cidVersion != 0 && options.cidVersion != 1) {
             throw new Error('unsupported or invalid cidVersion');
@@ -47,5 +53,5 @@ export function validateEthofsOptions(options) {
         if (options.wrapWithDirectory !== true && options.wrapWithDirectory !== false) {
             throw new Error('wrapWithDirectory must be a boolean value of true or false');
         }
-    }
+    }*/
 }

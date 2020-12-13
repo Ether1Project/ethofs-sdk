@@ -9,7 +9,7 @@ import testAuthentication from './commands/data/testAuthentication';
 import pinList from './commands/data/pinList/pinList';
 import userPinnedDataTotal from './commands/data/userPinnedDataTotal';
 
-export default function pinataClient(ethofsKey) {
+export default function ethofsClient(ethofsKey) {
     let client = {};
 
     //  setting up the actual calls you can make using this package

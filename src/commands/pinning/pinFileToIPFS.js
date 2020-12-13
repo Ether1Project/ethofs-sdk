@@ -1,25 +1,33 @@
-//import axios from 'axios';
 import ipfsClient from 'ipfs-http-client';
 import { apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
 //import NodeFormData from 'form-data';
 import stream from 'stream';
-//import { validateEthofsKey, validateMetadata, validateEthofsOptions } from '../../util/validators';
-import { validateEthofsKey } from '../../util/validators';
+import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
 import Web3 from 'web3';
 
-//export default function pinFileToIPFS(ethofsKey, readStream, options) {
-export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName) {
+export default function pinFileToIPFS(ethofsKey, readStream, options) {
 
     var web3 = new Web3(`${baseUrl}`);
     var minimumContractCost = 10000000000000000;
     var hostingCost = 1.0;
     var hostingCostWei = hostingCost * 1000000000000000000;
-    var hostingContractDuration = 100000;
+    //var hostingContractDuration = 100000;
+    var data;
 
     validateEthofsKey(ethofsKey);
 
     const apiEndpoint = `${apiBaseUrl}`;
     const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
+
+    if (options) {
+        if (options.ethofsData) {
+            validateEthofsData(options.ethofsData);
+            data = JSON.stringify(options.ethofsData);
+        }
+        if (options.ethofsOptions) {
+            validateEthofsOptions(options.ethofsOptions);
+        }
+    }
 
     async function uploadToIPFS(readStream) {
 
@@ -28,10 +36,10 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
     };
     function waitForReceipt(hash, cb) {
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {
-            console.log('Waiting For Transaction Confirmation');
+            //console.log('Waiting For Transaction Confirmation');
             web3.eth.getBlock('latest', function (e, res) {
                 if (!e) {
-                    console.log('New ETHO Block Received - Block Number: ' + res.number);
+                    //console.log('New ETHO Block Received - Block Number: ' + res.number);
                 }
             });
             if (err) {
@@ -39,14 +47,14 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
                 console.error(err);
             }
             if (receipt !== null) {
-                console.log('Ether-1 transaction has been confirmed');
+                //console.log('Ether-1 transaction has been confirmed');
                 if (cb) {
                     cb(receipt);
                 }
             } else {
                 setTimeout(function () {
                     waitForReceipt(hash, cb);
-                }, 10000);
+                }, 5000);
             }
         });
     }
@@ -67,10 +75,11 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
 
         uploadToIPFS(readStream).then((result) => {
 
-            console.log('Path: ' + result.path.toString());
-            console.log('Size: ' + result.size.toString());
-            console.log('Name: ' + hostingContractName);
-            console.log('Duration: ' + hostingContractDuration.toString());
+            //console.log('Path: ' + result.path.toString());
+            //console.log('Size: ' + result.size.toString());
+            //console.log('Name: ' + options.ethofsData.name);
+            //console.log('Duration: ' + options.ethofsOptions.hostingContractDuration);
+            //console.log('Data: ' + data);
 
             web3.eth.net.isListening()
             .then(function () {
@@ -80,10 +89,10 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
                 var ethofsContract = new web3.eth.Contract(controllerABI, controllerContractAddress);
                 var contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
                 var contentPathString = 'ethoFSPinningChannel_alpha11:';
-                var contractCost = calculateCost(result.size, hostingContractDuration, hostingCostWei);
+                var contractCost = calculateCost(result.size, options.ethofsOptions.hostingContractDuration, hostingCostWei);
 
-                console.log('ContentHashString: ' + contentHashString);
-                console.log('ContentPathString: ' + contentPathString);
+                //console.log('ContentHashString: ' + contentHashString);
+                //console.log('ContentPathString: ' + contentPathString);
 
                 web3.eth.accounts.wallet.add(account);
                 web3.eth.defaultAccount = account.address;
@@ -93,7 +102,7 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
                     from: web3.eth.defaultAccount,
                     value: contractCost,
                     gas: 6000000,
-                    data: ethofsContract.methods.AddNewContract(result.path.toString(), hostingContractName, hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
+                    data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
                 };
 
                 ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
@@ -105,12 +114,16 @@ export default function pinFileToIPFS(ethofsKey, readStream, hostingContractName
                             });*/
                             web3.eth.accounts.signTransaction(tx, privateKey)
                             .then(function (signedTransactionData) {
-                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, result) {
+                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
                                     if (!error) {
-                                        if (result) {
-                                            waitForReceipt(result, function (receipt) {
-                                                console.log('Transaction Has Been Mined: ' + receipt);
-                                                resolve(result);
+                                        if (ethoResult) {
+                                            waitForReceipt(ethoResult, function (receipt) {
+                                                //console.log('Transaction Has Been Mined: ' + receipt);
+                                                resolve({
+                                                    ipfsHash: result.path,
+                                                    ethoTxHash: ethoResult,
+                                                    uploadCost: contractCost
+                                                });
                                             });
                                         } else {
                                             console.log('There was a problem adding new contract');

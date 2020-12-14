@@ -39,7 +39,7 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 * Pinning
   * [pinByHash](#pinByHash-anchor) - WIP
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
-  * [pinFromFS](#pinFromFS-anchor) - WIP
+  * [pinFromFS](#pinFromFS-anchor)
   * [pinJobs](#pinJobs-anchor) - WIP
   * [pinJSONToIPFS](#pinJSONToIPFS-anchor) - WIP
   * [unpin](#unpin-anchor) - WIP
@@ -52,14 +52,14 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 
 <a name="pinFileToIPFS-anchor"></a>
 ### `pinFileToIPFS`
-Send a file to to ethoFS for direct pinning to IPFS.
+Send a file to ethoFS for direct pinning to IPFS.
 
 ##### `ethofs.pinFileToIPFS(readableStream, options)`
 ##### Params
 * `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the file to be added 
-* `options` (optional): A JSON object that can contain the following keyvalues:
-  * `ethofsData` (optional): A JSON object with [optional data](#ethofsData-anchor) for the file being pinned
-  * `ethofsOptions` (optional): A JSON object with additional [options](#ethofsData-anchor) for the file being pinned
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsData` : A JSON object with (#ethofsData-anchor) for the data being pinned
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
 #### Response
 ```
 {
@@ -92,6 +92,48 @@ ethofs.pinFileToIPFS(readableStreamForFile, options).then((result) => {
     console.log(err);
 });
 ```
+<a name="pinFromFS-anchor"></a>
+### `pinFromFS`
+Send a file/directory from local filesystem to ethoFS for direct pinning to IPFS.
+
+##### `ethofs.pinFromFS(fsLocation, options)`
+##### Params
+* `fsLocation` - A local filesystem location of the file or directory to be added 
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsData` : A JSON object with (#ethofsData-anchor) for the data being pinned
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
+#### Response
+```
+{
+    ipfsHash: This is the IPFS multi-hash provided back for your content,
+    ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
+    uploadCost: This is the total cost in ETHO for the upload
+}
+```
+##### Example Code
+```javascript
+const sourceDirectory = ('./yourDirectory');
+const options = {
+    ethofsData: {
+        name: 'MyCustomDirectoryUploadName',
+        keyvalues: {
+            customKey: 'customValue',
+            customKey2: 'customValue2'
+        }
+    },
+    ethofsOptions: {
+        uploadContractDuration: 100000
+    }
+};
+ethofs.pinFromFS(sourceDirectory, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+
 <a name="testAuthentication-anchor"></a>
 ### `testAuthentication`
 Tests that you can authenticate with ethoFS correctly

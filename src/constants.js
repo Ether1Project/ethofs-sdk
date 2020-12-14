@@ -1,3 +1,4 @@
+export const hostingCost = 1.0;
 export const baseUrl = 'https://rpc.ether1.org';
 export const apiBaseUrl = 'ipfs.infura.io';
 export const controllerContractAddress = '0xc38B47169950D8A28bC77a6Fa7467464f25ADAFc';

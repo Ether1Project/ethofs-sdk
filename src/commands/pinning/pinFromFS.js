@@ -1,16 +1,154 @@
-import axios from 'axios';
-import { baseUrl } from './../../constants';
-import NodeFormData from 'form-data';
-import {validateEthofsKey, validateMetadata, validateEthofsOptions} from '../../util/validators';
-import basePathConverter from 'base-path-converter';
+import ipfsClient from 'ipfs-http-client';
+import { hostingCost, apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
+import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
+import Web3 from 'web3';
 const fs = require('fs');
-const recursive = require('recursive-fs');
+const bs58 = require('bs58');
+const path = require('path');
 
 export default function pinFromFS(ethofsKey, sourcePath, options) {
+
+    var web3 = new Web3(`${baseUrl}`);
+    var minimumContractCost = 10000000000000000;
+    var hostingCostWei = hostingCost * 1000000000000000000;
+    var data;
+
     validateEthofsKey(ethofsKey);
 
+    const apiEndpoint = `${apiBaseUrl}`;
+    const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
+
+    if (options) {
+        if (options.ethofsData) {
+            validateEthofsData(options.ethofsData);
+            data = JSON.stringify(options.ethofsData);
+        }
+        if (options.ethofsOptions) {
+            validateEthofsOptions(options.ethofsOptions);
+        }
+    }
+
+    async function uploadToIPFS(files) {
+
+        return await ipfs.add(files);
+
+    };
+
+    function waitForReceipt(hash, cb) {
+        web3.eth.getTransactionReceipt(hash, function (err, receipt) {
+            web3.eth.getBlock('latest', function (e, res) {
+                if (!e) {
+                }
+            });
+            if (err) {
+                console.log('Error connecting to Ether-1 Network: ' + err);
+                console.error(err);
+            }
+            if (receipt !== null) {
+                if (cb) {
+                    cb(receipt);
+                }
+            } else {
+                setTimeout(function () {
+                    waitForReceipt(hash, cb);
+                }, 5000);
+            }
+        });
+    }
+
+    function calculateCost(contractSize, contractDuration, hostingCost) {
+        var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
+
+        if (cost < minimumContractCost) {
+            cost = minimumContractCost;
+        }
+        return cost;
+    }
+
+    function getAllFiles(dirPath, OriginalPath, ArrayOfFiles) {
+
+        var files = fs.readdirSync(dirPath);
+        var arrayOfFiles = ArrayOfFiles || [];
+        var originalPath = OriginalPath || path.resolve(dirPath, '..');
+        var folder = path.relative(originalPath, path.join(dirPath, '/'));
+
+        arrayOfFiles.push({
+            path: folder.replace(/\\/g, '/'),
+            mtime: fs.statSync(folder).mtime
+        });
+
+        files.forEach(function (file) {
+            if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+                arrayOfFiles = getAllFiles(dirPath + '/' + file, originalPath, arrayOfFiles);
+            } else {
+                file = path.join(dirPath, '/', file);
+
+                arrayOfFiles.push({
+                    path: path.relative(originalPath, file).replace(/\\/g, '/'),
+                    content: fs.readFileSync(file),
+                    mtime: fs.statSync(file).mtime
+                });
+            }
+        });
+
+        return arrayOfFiles;
+    }
+
     return new Promise((resolve, reject) => {
-        const endpoint = `${baseUrl}/pinning/pinFileToIPFS`;
+
+        function pinToEthofs(result) {
+            web3.eth.net.isListening()
+            .then(function () {
+                var account = web3.eth.accounts.privateKeyToAccount('0x' + ethofsKey);
+                var privateKey = '0x' + ethofsKey;
+                var ethofsContract = new web3.eth.Contract(controllerABI, controllerContractAddress);
+                var contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
+                var contentPathString = 'ethoFSPinningChannel_alpha11:';
+                var contractCost = calculateCost(result.size, options.ethofsOptions.hostingContractDuration, hostingCostWei);
+
+                web3.eth.accounts.wallet.add(account);
+                web3.eth.defaultAccount = account.address;
+
+                const tx = {
+                    to: controllerContractAddress,
+                    from: web3.eth.defaultAccount,
+                    value: contractCost,
+                    gas: 6000000,
+                    data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
+                };
+
+                ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
+                    if (!error) {
+                        if (ethofsResult) {
+                            web3.eth.accounts.signTransaction(tx, privateKey)
+                            .then(function (signedTransactionData) {
+                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
+                                    if (!error) {
+                                        if (ethoResult) {
+                                            waitForReceipt(ethoResult, function (receipt) {
+                                                resolve({
+                                                    ipfsHash: bs58.encode(result.cid.multihash),
+                                                    ethoTxHash: ethoResult,
+                                                    uploadCost: contractCost
+                                                });
+                                            });
+                                        } else {
+                                            reject(new Error('There was a problem adding new contract'));
+                                        }
+                                    } else {
+                                        reject(error);
+                                    }
+                                });
+                            });
+                        } else {
+                            reject(new Error('ethoFS User Not Found'));
+                        }
+                    } else {
+                        reject(new Error('Ether-1 RPC Access Error: ${error}'));
+                    }
+                });
+            });
+        }
 
         fs.lstat(sourcePath, (err, stats) => {
             if (err) {
@@ -18,93 +156,18 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
             }
             if (stats.isFile()) {
                 //we need to create a single read stream instead of reading the directory recursively
-                const data = new NodeFormData();
+                let readStream = fs.createReadStream(sourcePath);
 
-                data.append('file', fs.createReadStream(sourcePath));
-
-                if (options) {
-                    if (options.ethofsMetadata) {
-                        validateMetadata(options.ethofsMetadata);
-                        data.append('ethofsMetadata', JSON.stringify(options.ethofsMetadata));
-                    }
-                    if (options.ethofsOptions) {
-                        validateEthofsOptions(options.ethofsOptions);
-                        data.append('ethofsOptions', JSON.stringify(options.ethofsOptions));
-                    }
-                }
-
-                axios.post(
-                    endpoint,
-                    data,
-                    {
-                        withCredentials: true,
-                        maxContentLength: 'Infinity', //this is needed to prevent axios from erroring out with large directories
-                        headers: {
-                            'Content-type': `multipart/form-data; boundary= ${data._boundary}`,
-                            'ethofs_key': ethofsKey
-                        }
-                    }).then(function (result) {
-                    if (result.status !== 200) {
-                        reject(new Error(`unknown server response while pinning File to IPFS: ${result}`));
-                    }
-                    resolve(result.data);
-                }).catch(function (error) {
-                    //  handle error here
-                    if (error && error.response && error.response && error.response.data && error.response.data.error) {
-                        reject(new Error(error.response.data.error));
-                    } else {
-                        reject(error);
-                    }
+                uploadToIPFS(readStream).then((result) => {
+                    pinToEthofs(result);
                 });
+
             } else {
-                recursive.readdirr(sourcePath, function (err, dirs, files) {
-                    if (err) {
-                        reject(new Error(err));
-                    }
 
-                    let data = new NodeFormData();
+                let files = getAllFiles(sourcePath);
 
-                    files.forEach((file) => {
-                        //for each file stream, we need to include the correct relative file path
-                        data.append('file', fs.createReadStream(file), {
-                            filepath: basePathConverter(sourcePath, file)
-                        });
-                    });
-
-                    if (options) {
-                        if (options.ethofsMetadata) {
-                            validateMetadata(options.ethofsMetadata);
-                            data.append('ethofsMetadata', JSON.stringify(options.ethofsMetadata));
-                        }
-                        if (options.ethofsOptions) {
-                            validateEthofsOptions(options.ethofsOptions);
-                            data.append('ethofsOptions', JSON.stringify(options.ethofsOptions));
-                        }
-                    }
-
-                    axios.post(
-                        endpoint,
-                        data,
-                        {
-                            withCredentials: true,
-                            maxContentLength: 'Infinity', //this is needed to prevent axios from erroring out with large directories
-                            headers: {
-                                'Content-type': `multipart/form-data; boundary= ${data._boundary}`,
-                                'ethofs_key': ethofsKey
-                            }
-                        }).then(function (result) {
-                        if (result.status !== 200) {
-                            reject(new Error(`unknown server response while pinning File to IPFS: ${result}`));
-                        }
-                        resolve(result.data);
-                    }).catch(function (error) {
-                        //  handle error here
-                        if (error && error.response && error.response && error.response.data && error.response.data.error) {
-                            reject(new Error(error.response.data.error));
-                        } else {
-                            reject(error);
-                        }
-                    });
+                uploadToIPFS(files).then((result) => {
+                    pinToEthofs(result);
                 });
             }
         });

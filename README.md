@@ -37,7 +37,6 @@ ethofs.testAuthentication().then((result) => {
 Once you've set up your instance, using the ethoFS SDK is easy. Simply call your desired function and handle the results of the promise.
 
 * Pinning
-  * [pinByHash](#pinByHash-anchor) - WIP
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
   * [extendPin](#extendPin-anchor)

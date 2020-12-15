@@ -46,7 +46,7 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 
 * Data
   * [testAuthentication](#testAuthentication-anchor)
-  * [pinList](#pinList-anchor) - WIP
+  * [pinList](#pinList-anchor)
   * [userPinnedDataTotal](#userPinnedDataTotal-anchor) - WIP
 <br />
 
@@ -159,6 +159,44 @@ ethofs.testAuthentication().then((result) => {
     console.log(err);
 });
 ```
+<a name="pinList-anchor"></a>
+### `pinList`
+List pin contracts stored in ethoFS.
+
+##### `ethofs.pinList(options)`
+##### Params
+* `options` (optional) : A JSON object that contains the following keyvalues:
+  * `ethofsDataFilter` (optional) : A JSON object with (#ethofsDataFilter-anchor) for the filtering out pinned data
+#### Response
+```
+{
+    address: This is the Ether-1 contract address,
+    data: This is any saved data along with upload (ie name/keyvalues),
+    ipfsHash: This is the IPFS multi-hash provided back for your content,
+    uploadBlock: This is the original Ether-1 block the upload was iniated/recorded in,
+    expirationBlock: This is the Ether-1 expiration block of the upload contract
+}
+```
+##### Example Code
+```javascript
+const options = {
+    ethofsDataFilter: {
+        name: 'MyNameFilter',
+        keyvalues: {
+            customKeyFilter: 'customValueFilter',
+            customKey2Filter: 'customValue2Filter'
+        }
+    },
+};
+ethofs.pinList(options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+
 <a name="ethofsOptions-anchor"></a>
 
 ## ethoFS Options
@@ -189,6 +227,26 @@ The options object can consist of the following values:
     keyvalues: {
         customKey: 'customValue',
         customKey2: 'customValue2'
+    }
+}
+```
+
+<a name="ethofsDataFilter-anchor"></a>
+
+## ethoFS Data Filter
+Some endpoints allow you to pass additional data filters to filter out existing contracts.
+
+The options object can consist of the following values:
+* name (optional) - The name of your upload.
+* keyvalues (optional) - Misc metadata stored with your upload.
+
+##### Example ethofsDataFilter object
+```
+{
+    name: 'UploadContractNameFilter',
+    keyvalues: {
+        customKeyFilter: 'customValueFilter',
+        customKey2Filter: 'customValue2Filter'
     }
 }
 ```

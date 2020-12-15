@@ -135,7 +135,7 @@ ethofs.pinFromFS(sourceDirectory, options).then((result) => {
 ### `unpin`
 Have ethoFS unpin content that you've pinned/uploaded through the platform.
 
-##### `ethofs.extendPin(uploadContractAddress, extensionDuration)`
+##### `ethofs.extendPin(uploadContractAddress, options)`
 ##### Params
 * `uploadContractAddress` - the upload contract address of the content you wish to remove from ethoFS
 * `options` : A JSON object that contains the following keyvalues:

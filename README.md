@@ -37,10 +37,9 @@ ethofs.testAuthentication().then((result) => {
 Once you've set up your instance, using the ethoFS SDK is easy. Simply call your desired function and handle the results of the promise.
 
 * Pinning
-  * [pinByHash](#pinByHash-anchor) - WIP
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
-  * [extendPin](#extendPin-anchor) - WIP
+  * [extendPin](#extendPin-anchor)
   * [unpin](#unpin-anchor)
 
 * Data
@@ -124,6 +123,36 @@ const options = {
     }
 };
 ethofs.pinFromFS(sourceDirectory, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="extendPin-anchor"></a>
+### `unpin`
+Have ethoFS unpin content that you've pinned/uploaded through the platform.
+
+##### `ethofs.extendPin(uploadContractAddress, options)`
+##### Params
+* `uploadContractAddress` - the upload contract address of the content you wish to remove from ethoFS
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsOptions` : A JSON object with (#ethofsOptions-anchor) for the data being extended
+#### Response
+```
+{
+    ethoTXHash: This is transaction hash of the confirmed upload contract extension on the Ether-1 Network
+}
+```
+##### Example Code
+```javascript
+const options = {
+    ethofsOptions: {
+        uploadContractDuration: 100000
+    }
+};
+ethofs.extendPin(hostingContractAddress, options).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {

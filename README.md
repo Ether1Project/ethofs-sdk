@@ -40,14 +40,11 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
   * [pinByHash](#pinByHash-anchor) - WIP
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
-  * [pinJobs](#pinJobs-anchor) - WIP
-  * [pinJSONToIPFS](#pinJSONToIPFS-anchor) - WIP
-  * [unpin](#unpin-anchor) - WIP
+  * [unpin](#unpin-anchor)
 
 * Data
   * [testAuthentication](#testAuthentication-anchor)
   * [pinList](#pinList-anchor)
-  * [userPinnedDataTotal](#userPinnedDataTotal-anchor) - WIP
 <br />
 
 <a name="pinFileToIPFS-anchor"></a>
@@ -126,6 +123,29 @@ const options = {
     }
 };
 ethofs.pinFromFS(sourceDirectory, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="unpin-anchor"></a>
+### `unpin`
+Have ethoFS unpin content that you've pinned/uploaded through the platform.
+
+##### `ethofs.unpin(uploadContractAddress)`
+##### Params
+* `uploadContractAddress` - the upload contract address of the content you wish to remove from ethoFS
+#### Response
+```
+{
+    ethoTXHash: This is transaction hash of the confirmed upload contract removal on the Ether-1 Network
+}
+```
+##### Example Code
+```javascript
+ethofs.unpin(hashToUnpin).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {

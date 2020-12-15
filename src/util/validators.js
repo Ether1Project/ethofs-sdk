@@ -4,6 +4,33 @@ export function validateEthofsKey(ethofsKey) {
     }
 }
 
+export function validateEthofsDataFilter(data) {
+    if (data.name) {
+        if (!(typeof data.name === 'string' || data.name instanceof String)) {
+            throw new Error('ethofsData name must be of type string');
+        }
+    }
+
+    if (data.keyvalues) {
+        if (!(typeof data.keyvalues === 'object')) {
+            throw new Error('ethofsData keyvalues must be an object');
+        }
+
+        let i = 0;
+
+        Object.entries(data.keyvalues).forEach(function (keyValue) {
+            if (i > 9) {
+                throw new Error('No more than 10 keyvalues can be provided for ethofsData entries');
+            }
+            //  we want to make sure that the input is a string, a boolean, or a number, so we don't get an object passed in by accident
+            if (!(typeof keyValue[1] === 'string' || typeof keyValue[1] === 'boolean' || !isNaN(keyValue[1]))) {
+                throw new Error('EthofsData keyvalue values must be strings, booleans, or numbers');
+            }
+            i++;
+        });
+    }
+}
+
 export function validateEthofsData(data) {
     if (data.name) {
         if (!(typeof data.name === 'string' || data.name instanceof String)) {

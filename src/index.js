@@ -5,6 +5,8 @@ import unpin from './commands/pinning/unpin';
 import extendPin from './commands/pinning/extendPin';
 import testAuthentication from './commands/data/testAuthentication';
 import pinList from './commands/data/pinList/pinList';
+import networkStats from './commands/data/networkStats/networkStats';
+import networkUsage from './commands/data/networkUsage/networkUsage';
 
 export default function ethofsClient(ethofsKey) {
     let client = {};
@@ -30,6 +32,12 @@ export default function ethofsClient(ethofsKey) {
     };
     client.pinList = function (filters) {
         return pinList(ethofsKey, filters);
+    };
+    client.networkStats = function () {
+        return networkStats();
+    };
+    client.networkUsage = function () {
+        return networkUsage();
     };
     return client;
 }

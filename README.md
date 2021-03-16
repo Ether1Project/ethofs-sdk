@@ -17,6 +17,13 @@ npm install --save @ethofs/sdk
 
 ## Setup
 To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key. Register a new upload address: [ethoFS Uploads](https://ethofs.com/uploads.html).
+
+## Initialization Without Authentication
+```javascript
+const ethofsSDK = require('@ethofs/sdk');
+const ethofs = ethofsSDK();
+```
+## Initialization With Authentication
 ```javascript
 const ethofsSDK = require('@ethofs/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey');
@@ -32,10 +39,16 @@ ethofs.testAuthentication().then((result) => {
     console.log(err);
 });
 ```
-
 ## Usage
 Once you've set up your instance, using the ethoFS SDK is easy. Simply call your desired function and handle the results of the promise.
 
+## Authentication Not Required (ethoFS key not required on initialization)
+* Data
+  * [networkStats](#networkStats-anchor)
+
+## Authentication Required (ethoFS key required on initialization)
+* User
+  * [addUser](#addUser-anchor)
 * Pinning
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
@@ -46,7 +59,62 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
   * [testAuthentication](#testAuthentication-anchor)
   * [pinList](#pinList-anchor)
 <br />
+<a name="networkStats-anchor"></a>
+### `networkStats`
+Retrieve ethoFS Network Stats.
 
+##### `ethofs.networkStats()`
+##### Params
+
+#### Response
+```
+{
+    activeUploadContracts: This is number of active upload contracts on the network,
+    totalNetworkStorageUse: This is total used storage space(in bytes) used on the network,
+    networkStorageAvailable: This is total used storage space(in bytes) available on the network,
+    active_gatewaynodes: This is total number of active Gateway Nodes on the network,
+    active_masternodes: This is total number of active Masternodes on the network,
+    active_servicenodes: This is total number of active Service Nodes on the network,
+    gatewaynode_reward: This is the previous daily reward payment for Gateway Nodes,
+    masternode_reward: This is the previous daily reward payment for Masternodes,
+    servicenode_reward: This is the previous daily reward payment for Service Nodes
+}
+```
+##### Example Code
+```javascript
+ethofs.networkStats().then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="addUser-anchor"></a>
+### `addUser`
+Add a new user/address to ethoFS network.
+
+##### `ethofs.addUser(userName)`
+##### Params
+* `userName` - A string of the desired user name for ethoFS registration
+#### Response
+```
+{
+    ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network
+}
+```
+##### Example Code
+```javascript
+var userName = 'TestUserName';
+
+ethofs.addUser(userName).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
 <a name="pinFileToIPFS-anchor"></a>
 ### `pinFileToIPFS`
 Send a file to ethoFS for direct pinning to IPFS.

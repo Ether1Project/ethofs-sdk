@@ -45,6 +45,7 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 ## Authentication Not Required (ethoFS key not required on initialization)
 * Data
   * [networkStats](#networkStats-anchor)
+  * [nodeLocations](#nodeLocations-anchor)
 
 ## Authentication Required (ethoFS key required on initialization)
 * User
@@ -83,6 +84,35 @@ Retrieve ethoFS Network Stats.
 ##### Example Code
 ```javascript
 ethofs.networkStats().then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="nodeLocations-anchor"></a>
+### `nodeLocations`
+Retrieve ethoFS Node Location Information.
+
+##### `ethofs.nodeLocations()`
+##### Params
+
+#### Response Array
+```
+[
+    {
+        type: This is type of node (Gateway Node, Masternode, Service Node),
+        country: This is the country where node is located in,
+        city: This is the city where node is located in,
+        latitude: This is the latitude of node (geolocated by IP address),
+        longitude: This is the longitude of node (geolocated by IP address)
+    }
+]
+```
+##### Example Code
+```javascript
+ethofs.nodeLocations().then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {

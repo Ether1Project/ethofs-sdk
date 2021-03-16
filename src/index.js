@@ -6,6 +6,7 @@ import extendPin from './commands/pinning/extendPin';
 import testAuthentication from './commands/data/testAuthentication';
 import pinList from './commands/data/pinList/pinList';
 import networkStats from './commands/data/networkStats/networkStats';
+import nodeLocations from './commands/data/networkStats/nodeLocations';
 import addUser from './commands/user/addUser';
 
 export default function ethofsClient(ethofsKey) {
@@ -35,6 +36,9 @@ export default function ethofsClient(ethofsKey) {
     };
     client.networkStats = function () {
         return networkStats();
+    };
+    client.nodeLocations = function () {
+        return nodeLocations();
     };
     client.addUser = function (userName) {
         return addUser(ethofsKey, userName);

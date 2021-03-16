@@ -8,7 +8,7 @@ export default function networkStats() {
     return new Promise((resolve, reject) => {
         axios.get(endpoint).then(function (result) {
             if (result.status !== 200) {
-                reject(new Error(`unknown server response while attempting to retrieve user pin list: ${result}`));
+                reject(new Error(`unknown server response while attempting to retrieve network stats: ${result}`));
             }
             //data = JSON.parse(result.data);
             resolve(result.data);

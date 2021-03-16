@@ -1,6 +1,6 @@
 {
   "name": "@ethofs/sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Official SDK for the ethoFS Platform",
   "main": "lib/ethofs-sdk.js",
   "scripts": {

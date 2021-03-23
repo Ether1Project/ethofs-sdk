@@ -151,6 +151,7 @@ Send a file to ethoFS for direct pinning to IPFS.
 
 ##### `ethofs.pinFileToIPFS(readableStream, options)`
 ##### Params
+* `ethoFsKey` - The private key to be used for uploading the file 
 * `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the file to be added 
 * `options` : A JSON object that contains the following keyvalues:
   * `ethofsData` : A JSON object with (#ethofsData-anchor) for the data being pinned
@@ -167,6 +168,7 @@ Send a file to ethoFS for direct pinning to IPFS.
 ```javascript
 const fs = require('fs');
 const readableStreamForFile = fs.createReadStream('./yourfile.png');
+const ethoFsKey = 'privateKeyString??';
 const options = {
     ethofsData: {
         name: 'MyCustomUploadName',
@@ -179,7 +181,7 @@ const options = {
         uploadContractDuration: 100000
     }
 };
-ethofs.pinFileToIPFS(readableStreamForFile, options).then((result) => {
+ethofs.pinFileToIPFS(ethoFsKey, readableStreamForFile, options).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {

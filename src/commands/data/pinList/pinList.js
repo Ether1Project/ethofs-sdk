@@ -48,6 +48,10 @@ export default function pinList(ethofsKey, options) {
 
                         let filteredContractCount = 0;
 
+                        if (contractCount === 0) {
+                            resolve(uploadContractArray);
+                        }
+
                         for (let contractIndex = 0; contractIndex < contractCount; contractIndex++) {
 
                             ethofsContract.methods.GetHostingContractAddress(web3.eth.defaultAccount, contractIndex).call().then((hostingContractAddress) => {
@@ -88,6 +92,10 @@ export default function pinList(ethofsKey, options) {
                                         if (!filteredContract) {
                                             filteredContractCount++;
                                         }
+                                    } else {
+
+                                        uploadContractArray.push(result);
+
                                     }
 
                                     if (uploadContractArray.length >= (contractCount - (expiredContractCount + filteredContractCount))) {

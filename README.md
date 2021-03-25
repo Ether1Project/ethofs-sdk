@@ -46,6 +46,7 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 * Data
   * [networkStats](#networkStats-anchor)
   * [nodeLocations](#nodeLocations-anchor)
+  * [calculateCost](#calculateCost-anchor)
 
 ## Authentication Required (ethoFS key required on initialization)
 * User
@@ -120,6 +121,40 @@ ethofs.nodeLocations().then((result) => {
     console.log(err);
 });
 ```
+<a name="calculateCost-anchor"></a>
+### `calculateCost`
+Send a file to ethoFS for direct pinning to IPFS.
+
+##### `ethofs.calculateCost(readableStream, options)`
+##### Params
+* `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the file to be added 
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
+#### Response
+```
+{
+    uploadSize: This is the calculated size of the upload,
+    uploadDuration: This is the upload contract duration provided by the user,
+    uploadCost: This is the calculated total cost in ETHO (wei) for the upload
+}
+```
+##### Example Code
+```javascript
+const fs = require('fs');
+const readableStreamForFile = fs.createReadStream('./yourfile.png');
+const options = {
+    ethofsOptions: {
+        hostingContractDuration: 100000
+    }
+};
+ethofs.calculateCost(readableStreamForFile, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
 <a name="addUser-anchor"></a>
 ### `addUser`
 Add a new user/address to ethoFS network.
@@ -176,7 +211,7 @@ const options = {
         }
     },
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.pinFileToIPFS(readableStreamForFile, options).then((result) => {
@@ -217,7 +252,7 @@ const options = {
         }
     },
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.pinFromFS(sourceDirectory, options).then((result) => {
@@ -247,7 +282,7 @@ Have ethoFS unpin content that you've pinned/uploaded through the platform.
 ```javascript
 const options = {
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.extendPin(hostingContractAddress, options).then((result) => {
@@ -356,7 +391,7 @@ The options object can consist of the following values:
 ##### Example ethofsOptions object
 ```
 {
-    uploadContractDuration: 100000
+    hostingContractDuration: 100000
 }
 ```
 <a name="ethofsData-anchor"></a>

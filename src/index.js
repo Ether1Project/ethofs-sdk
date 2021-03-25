@@ -3,6 +3,7 @@ import pinFileToIPFS from './commands/pinning/pinFileToIPFS';
 import pinFromFS from './commands/pinning/pinFromFS';
 import unpin from './commands/pinning/unpin';
 import extendPin from './commands/pinning/extendPin';
+import calculateCost from './commands/pinning/calculateCost';
 import testAuthentication from './commands/data/testAuthentication';
 import pinList from './commands/data/pinList/pinList';
 import networkStats from './commands/data/networkStats/networkStats';
@@ -27,6 +28,9 @@ export default function ethofsClient(ethofsKey) {
     };
     client.extendPin = function (uploadContractAddress, options) {
         return extendPin(ethofsKey, uploadContractAddress, options);
+    };
+    client.calculateCost = function (readableStream, options) {
+        return calculateCost(readableStream, options);
     };
     client.testAuthentication = function () {
         return testAuthentication(ethofsKey);

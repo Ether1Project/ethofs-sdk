@@ -64,7 +64,7 @@ export function validateEthofsOptions(options) {
     }
 
     if (options.hostingContractDuration) {
-        if (options.hostingContractDuration < 100000 || typeof options.hostingContractDuration !== 'number') {
+        if (options.hostingContractDuration < 6646 || typeof options.hostingContractDuration !== 'number') {
             throw new Error('incorrect hosting contract duration');
         }
     }

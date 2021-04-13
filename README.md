@@ -269,7 +269,7 @@ ethofs.pinFromFS(sourceDirectory, options).then((result) => {
 });
 ```
 <a name="extendPin-anchor"></a>
-### `unpin`
+### `extendPin`
 Have ethoFS unpin content that you've pinned/uploaded through the platform.
 
 ##### `ethofs.extendPin(uploadContractAddress, options)`

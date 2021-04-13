@@ -34,13 +34,10 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
     };
 
     function waitForReceipt(hash, cb) {
-        var currentBlockNumber;
-
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {
             web3.eth.getBlock('latest', function (e, res) {
                 if (!e) {
                 }
-                currentBlockNumber = res.number;
             });
             if (err) {
                 console.log('Error connecting to Ether-1 Network: ' + err);
@@ -48,7 +45,7 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
             }
             if (receipt !== null) {
                 if (cb) {
-                    cb(receipt, currentBlockNumber);
+                    cb(receipt);
                 }
             } else {
                 setTimeout(function () {
@@ -61,7 +58,7 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
     function calculateCost(contractSize, contractDuration, hostingCost) {
         var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
 
-        return cost;
+        return Math.round(cost);
     }
 
     function getAllFiles(dirPath, OriginalPath, ArrayOfFiles) {
@@ -124,13 +121,13 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
                                 web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
                                     if (!error) {
                                         if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt, blockNumber) {
+                                            waitForReceipt(ethoResult, function (receipt) {
                                                 resolve({
                                                     ipfsHash: bs58.encode(result.cid.multihash),
                                                     ethoTxHash: ethoResult,
                                                     uploadCost: contractCost,
-                                                    initiationBlock: blockNumber,
-                                                    expirationBlock: (blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                    initiationBlock: receipt.blockNumber,
+                                                    expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
                                                 });
                                             });
                                         } else {

@@ -44,7 +44,7 @@ export default function extendPin(ethofsKey, hostingContractAddress, options) {
     function calculateContractCost(contractSize, contractDuration, hostingCost) {
         var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
 
-        return cost;
+        return Math.round(cost);
     }
 
     async function getEthofsContentSize(ethofsContract, hostingContractAddress) {

@@ -123,9 +123,9 @@ ethofs.nodeLocations().then((result) => {
 ```
 <a name="calculateCost-anchor"></a>
 ### `calculateCost`
-Send a file to ethoFS for direct pinning to IPFS.
+Estimate cost of a data upload by sending a request with upload duration and estimated size.
 
-##### `ethofs.calculateCost(readableStream, options)`
+##### `ethofs.calculateCost(options)`
 ##### Params
 * `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the file to be added 
 * `options` : A JSON object that contains the following keyvalues:
@@ -144,10 +144,11 @@ const fs = require('fs');
 const readableStreamForFile = fs.createReadStream('./yourfile.png');
 const options = {
     ethofsOptions: {
-        hostingContractDuration: 100000
+        hostingContractDuration: 100000,
+        hostingContractSize: 20000000
     }
 };
-ethofs.calculateCost(readableStreamForFile, options).then((result) => {
+ethofs.calculateCost(options).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {
@@ -195,7 +196,9 @@ Send a file to ethoFS for direct pinning to IPFS.
 {
     ipfsHash: This is the IPFS multi-hash provided back for your content,
     ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
-    uploadCost: This is the total cost in ETHO for the upload
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
 }
 ```
 ##### Example Code
@@ -237,7 +240,9 @@ Send a file/directory from local filesystem to ethoFS for direct pinning to IPFS
 {
     ipfsHash: This is the IPFS multi-hash provided back for your content,
     ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
-    uploadCost: This is the total cost in ETHO for the upload
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
 }
 ```
 ##### Example Code
@@ -319,7 +324,7 @@ ethofs.unpin(hashToUnpin).then((result) => {
 
 <a name="testAuthentication-anchor"></a>
 ### `testAuthentication`
-Tests that you can authenticate with ethoFS correctly
+Tests that you can authenticate with ethoFS correctly and the authentication key is registered
 
 ##### `ethofs.testAuthentication()`
 ##### Params
@@ -356,7 +361,7 @@ List pin contracts stored in ethoFS.
     address: This is the Ether-1 contract address,
     data: This is any saved data along with upload (ie name/keyvalues),
     ipfsHash: This is the IPFS multi-hash provided back for your content,
-    uploadBlock: This is the original Ether-1 block the upload was iniated/recorded in,
+    initiationBlock: This is the original Ether-1 block the upload was iniated/recorded in,
     expirationBlock: This is the Ether-1 expiration block of the upload contract
 }
 ```

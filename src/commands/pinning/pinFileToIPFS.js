@@ -31,10 +31,13 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
 
     };
     function waitForReceipt(hash, cb) {
+        var currentBlockNumber;
+
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {
             web3.eth.getBlock('latest', function (e, res) {
                 if (!e) {
                 }
+                currentBlockNumber = res.number;
             });
             if (err) {
                 console.log('Error connecting to Ether-1 Network: ' + err);
@@ -42,7 +45,7 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
             }
             if (receipt !== null) {
                 if (cb) {
-                    cb(receipt, res.number);
+                    cb(receipt, currentBlockNumber);
                 }
             } else {
                 setTimeout(function () {

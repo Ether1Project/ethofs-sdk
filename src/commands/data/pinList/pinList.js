@@ -20,7 +20,7 @@ export default function pinList(ethofsKey, options) {
             address: hostingContractAddress,
             data: await ethofsContract.methods.GetHostingContractName(hostingContractAddress).call(),
             ipfsHash: await ethofsContract.methods.GetMainContentHash(hostingContractAddress).call(),
-            uploadBlock: await ethofsContract.methods.GetHostingContractDeployedBlockHeight(hostingContractAddress).call(),
+            initiationBlock: await ethofsContract.methods.GetHostingContractDeployedBlockHeight(hostingContractAddress).call(),
             expirationBlock: await ethofsContract.methods.GetHostingContractExpirationBlockHeight(hostingContractAddress).call()
         };
 

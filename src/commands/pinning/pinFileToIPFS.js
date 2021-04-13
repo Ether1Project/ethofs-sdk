@@ -1,5 +1,5 @@
 import ipfsClient from 'ipfs-http-client';
-import { apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
+import { hostingCost, apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
 import stream from 'stream';
 import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
 import Web3 from 'web3';
@@ -7,8 +7,6 @@ import Web3 from 'web3';
 export default function pinFileToIPFS(ethofsKey, readStream, options) {
 
     var web3 = new Web3(`${baseUrl}`);
-    var minimumContractCost = 10000000000000000;
-    var hostingCost = 1.0;
     var hostingCostWei = hostingCost * 1000000000000000000;
     var data;
 
@@ -56,9 +54,6 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
     function calculateContractCost(contractSize, contractDuration, hostingCost) {
         var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
 
-        if (cost < minimumContractCost) {
-            cost = minimumContractCost;
-        }
         return cost;
     }
 

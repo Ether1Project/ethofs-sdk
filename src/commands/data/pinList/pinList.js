@@ -60,7 +60,7 @@ export default function pinList(ethofsKey, options) {
 
                                         expiredContractCount++;
 
-                                    } else if (options.ethofsDataFilter) {
+                                    } else if (options && (options.ethofsDataFilter)) {
 
                                         let filteredContract = false;
 

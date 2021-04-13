@@ -69,16 +69,9 @@ export function validateEthofsOptions(options) {
         }
     }
 
-/*    if (options.cidVersion) {
-        // eslint-disable-next-line eqeqeq
-        if (options.cidVersion != 0 && options.cidVersion != 1) {
-            throw new Error('unsupported or invalid cidVersion');
+    if (options.hostingContractSize) {
+        if (options.hostingContractSize < 0 || typeof options.hostingContractSize !== 'number') {
+            throw new Error('incorrect hosting contract size');
         }
     }
-    if (options.wrapWithDirectory) {
-        // eslint-disable-next-line eqeqeq
-        if (options.wrapWithDirectory !== true && options.wrapWithDirectory !== false) {
-            throw new Error('wrapWithDirectory must be a boolean value of true or false');
-        }
-    }*/
 }

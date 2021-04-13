@@ -5,7 +5,6 @@ import Web3 from 'web3';
 export default function extendPin(ethofsKey, hostingContractAddress, options) {
 
     var web3 = new Web3(`${baseUrl}`);
-    var minimumContractCost = 10000000000000000;
     var hostingCostWei = hostingCost * 1000000000000000000;
 
     validateEthofsKey(ethofsKey);
@@ -45,9 +44,6 @@ export default function extendPin(ethofsKey, hostingContractAddress, options) {
     function calculateContractCost(contractSize, contractDuration, hostingCost) {
         var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
 
-        if (cost < minimumContractCost) {
-            cost = minimumContractCost;
-        }
         return cost;
     }
 

@@ -1,4 +1,3 @@
-import pinByHash from './commands/pinning/pinByHash';
 import pinFileToIPFS from './commands/pinning/pinFileToIPFS';
 import pinFromFS from './commands/pinning/pinFromFS';
 import unpin from './commands/pinning/unpin';
@@ -14,9 +13,6 @@ export default function ethofsClient(ethofsKey) {
     let client = {};
 
     //  setting up the actual calls you can make using this package
-    client.pinByHash = function (hashToPin, options) {
-        return pinByHash(ethofsKey, hashToPin, options);
-    };
     client.pinFileToIPFS = function (readableStream, options) {
         return pinFileToIPFS(ethofsKey, readableStream, options);
     };

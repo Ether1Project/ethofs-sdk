@@ -9,7 +9,6 @@ const path = require('path');
 export default function pinFromFS(ethofsKey, sourcePath, options) {
 
     var web3 = new Web3(`${baseUrl}`);
-    var minimumContractCost = 10000000000000000;
     var hostingCostWei = hostingCost * 1000000000000000000;
     var data;
 
@@ -59,9 +58,6 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
     function calculateCost(contractSize, contractDuration, hostingCost) {
         var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
 
-        if (cost < minimumContractCost) {
-            cost = minimumContractCost;
-        }
         return cost;
     }
 

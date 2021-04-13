@@ -1,7 +1,7 @@
 import { hostingCost } from './../../constants';
 import { validateEthofsOptions } from '../../util/validators';
 
-export default function calculateCost(readStream, options) {
+export default function calculateCost(options) {
 
     var hostingCostWei = hostingCost * 1000000000000000000;
 

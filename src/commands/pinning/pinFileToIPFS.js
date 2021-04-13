@@ -42,7 +42,7 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
             }
             if (receipt !== null) {
                 if (cb) {
-                    cb(receipt);
+                    cb(receipt, res.number);
                 }
             } else {
                 setTimeout(function () {
@@ -94,11 +94,13 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
                                 web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
                                     if (!error) {
                                         if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt) {
+                                            waitForReceipt(ethoResult, function (receipt, blockNumber) {
                                                 resolve({
                                                     ipfsHash: result.path,
                                                     ethoTxHash: ethoResult,
-                                                    uploadCost: contractCost
+                                                    uploadCost: contractCost,
+                                                    initiationBlock: blockNumber,
+                                                    expirationBlock: (blockNumber + options.ethofsOptions.hostingContractDuration)
                                                 });
                                             });
                                         } else {

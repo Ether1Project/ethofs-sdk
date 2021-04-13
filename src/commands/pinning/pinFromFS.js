@@ -45,7 +45,7 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
             }
             if (receipt !== null) {
                 if (cb) {
-                    cb(receipt);
+                    cb(receipt, res.number);
                 }
             } else {
                 setTimeout(function () {
@@ -121,11 +121,13 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
                                 web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
                                     if (!error) {
                                         if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt) {
+                                            waitForReceipt(ethoResult, function (receipt, blockNumber) {
                                                 resolve({
                                                     ipfsHash: bs58.encode(result.cid.multihash),
                                                     ethoTxHash: ethoResult,
-                                                    uploadCost: contractCost
+                                                    uploadCost: contractCost, 
+                                                    initiationBlock: blockNumber,
+                                                    expirationBlock: (blockNumber + options.ethofsOptions.hostingContractDuration)
                                                 });
                                             });
                                         } else {

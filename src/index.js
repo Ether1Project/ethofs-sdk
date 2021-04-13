@@ -25,8 +25,8 @@ export default function ethofsClient(ethofsKey) {
     client.extendPin = function (uploadContractAddress, options) {
         return extendPin(ethofsKey, uploadContractAddress, options);
     };
-    client.calculateCost = function (readableStream, options) {
-        return calculateCost(readableStream, options);
+    client.calculateCost = function (options) {
+        return calculateCost(options);
     };
     client.testAuthentication = function () {
         return testAuthentication(ethofsKey);

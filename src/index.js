@@ -1,4 +1,5 @@
 import pinFileToIPFS from './commands/pinning/pinFileToIPFS';
+import pinFolderToIPFS from './commands/pinning/pinFolderToIPFS';
 import pinFromFS from './commands/pinning/pinFromFS';
 import unpin from './commands/pinning/unpin';
 import extendPin from './commands/pinning/extendPin';
@@ -15,6 +16,9 @@ export default function ethofsClient(ethofsKey) {
     //  setting up the actual calls you can make using this package
     client.pinFileToIPFS = function (readableStream, options) {
         return pinFileToIPFS(ethofsKey, readableStream, options);
+    };
+    client.pinFolderToIPFS = function (readableStream, options) {
+        return pinFolderToIPFS(ethofsKey, readableStream, options);
     };
     client.pinFromFS = function (sourcePath, options) {
         return pinFromFS(ethofsKey, sourcePath, options);

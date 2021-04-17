@@ -79,7 +79,7 @@ export default function pinFolderToIPFS(ethofsKey, readStream, options) {
                     from: web3.eth.defaultAccount,
                     value: contractCost,
                     gas: 6000000,
-                    data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
+                    data: ethofsContract.methods.AddNewContract(bs58.encode(result.cid.multihash), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
                 };
 
                 ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {

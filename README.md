@@ -53,6 +53,7 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
   * [addUser](#addUser-anchor)
 * Pinning
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
+  * [pinFolderToIPFS](#pinFolderToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
   * [extendPin](#extendPin-anchor)
   * [unpin](#unpin-anchor)
@@ -218,6 +219,50 @@ const options = {
     }
 };
 ethofs.pinFileToIPFS(readableStreamForFile, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="pinFolderToIPFS-anchor"></a>
+### `pinFolderToIPFS`
+Send a folder to ethoFS for direct pinning to IPFS.
+
+##### `ethofs.pinFolderToIPFS(readableStream, options)`
+##### Params
+* `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the folder to be added 
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsData` : A JSON object with (#ethofsData-anchor) for the data being pinned
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
+#### Response
+```
+{
+    ipfsHash: This is the IPFS multi-hash provided back for your content,
+    ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
+}
+```
+##### Example Code
+```javascript
+const fs = require('fs');
+const readableStreamForFolder = fs.createReadStream('./yourDirectory');
+const options = {
+    ethofsData: {
+        name: 'MyCustomUploadName',
+        keyvalues: {
+            customKey: 'customValue',
+            customKey2: 'customValue2'
+        }
+    },
+    ethofsOptions: {
+        hostingContractDuration: 100000
+    }
+};
+ethofs.pinFolderToIPFS(readableStreamForFolder, options).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {

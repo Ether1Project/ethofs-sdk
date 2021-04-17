@@ -1,6 +1,5 @@
 import ipfsClient from 'ipfs-http-client';
 import { hostingCost, apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
-import stream from 'stream';
 import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
 import Web3 from 'web3';
 
@@ -58,10 +57,6 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
     }
 
     return new Promise((resolve, reject) => {
-
-        if (!(readStream instanceof stream.Readable)) {
-            reject(new Error('readStream is not a readable stream'));
-        }
 
         uploadToIPFS(readStream).then((result) => {
 

@@ -56,6 +56,11 @@ export default function addUser(ethofsKey, userName) {
             ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
                 if (!error) {
                     if (ethofsResult) {
+
+                        reject(new Error('ethoFS User Already Exists'));
+
+                    } else {
+
                         web3.eth.accounts.signTransaction(tx, privateKey)
                         .then(function (signedTransactionData) {
                             web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
@@ -74,8 +79,6 @@ export default function addUser(ethofsKey, userName) {
                                 }
                             });
                         });
-                    } else {
-                        reject(new Error('ethoFS User Already Exists'));
                     }
                 } else {
                     reject(new Error('Ether-1 RPC Access Error: ${error}'));

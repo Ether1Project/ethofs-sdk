@@ -1,5 +1,5 @@
 import ipfsClient from 'ipfs-http-client';
-import { hostingCost, apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
+import { apiBaseUrl, baseUrl, controllerContractAddress, controllerABI, configContractAddress, configContractABI } from './../../constants';
 import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
 import Web3 from 'web3';
 const fs = require('fs');
@@ -9,7 +9,6 @@ const path = require('path');
 export default function pinFromFS(ethofsKey, sourcePath, options) {
 
     var web3 = new Web3(`${baseUrl}`);
-    var hostingCostWei = hostingCost * 1000000000000000000;
     var data;
 
     validateEthofsKey(ethofsKey);
@@ -61,6 +60,13 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
         return Math.round(cost);
     }
 
+    async function getEthofsUploadCost() {
+
+        var ethofsConfig = new web3.eth.Contract(configContractABI, configContractAddress);
+
+        return await ethofsConfig.methods.uintMap(0).call();
+    };
+
     function getAllFiles(dirPath, OriginalPath, ArrayOfFiles) {
 
         var files = fs.readdirSync(dirPath);
@@ -100,50 +106,53 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
                 var ethofsContract = new web3.eth.Contract(controllerABI, controllerContractAddress);
                 var contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
                 var contentPathString = 'ethoFSPinningChannel_alpha11:';
-                var contractCost = calculateCost(result.size, options.ethofsOptions.hostingContractDuration, hostingCostWei);
 
-                web3.eth.accounts.wallet.add(account);
-                web3.eth.defaultAccount = account.address;
+                getEthofsUploadCost().then((hostingCost) => {
+                    var contractCost = calculateCost(result.size, options.ethofsOptions.hostingContractDuration, hostingCost);
 
-                const tx = {
-                    to: controllerContractAddress,
-                    from: web3.eth.defaultAccount,
-                    value: contractCost,
-                    gas: 6000000,
-                    data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
-                };
+                    web3.eth.accounts.wallet.add(account);
+                    web3.eth.defaultAccount = account.address;
 
-                ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
-                    if (!error) {
-                        if (ethofsResult) {
-                            web3.eth.accounts.signTransaction(tx, privateKey)
-                            .then(function (signedTransactionData) {
-                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
-                                    if (!error) {
-                                        if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt) {
-                                                resolve({
-                                                    ipfsHash: bs58.encode(result.cid.multihash),
-                                                    ethoTxHash: ethoResult,
-                                                    uploadCost: contractCost,
-                                                    initiationBlock: receipt.blockNumber,
-                                                    expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
+                    const tx = {
+                        to: controllerContractAddress,
+                        from: web3.eth.defaultAccount,
+                        value: contractCost,
+                        gas: 6000000,
+                        data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
+                    };
+
+                    ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
+                        if (!error) {
+                            if (ethofsResult) {
+                                web3.eth.accounts.signTransaction(tx, privateKey)
+                                .then(function (signedTransactionData) {
+                                    web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
+                                        if (!error) {
+                                            if (ethoResult) {
+                                                waitForReceipt(ethoResult, function (receipt) {
+                                                    resolve({
+                                                        ipfsHash: bs58.encode(result.cid.multihash),
+                                                        ethoTxHash: ethoResult,
+                                                        uploadCost: contractCost,
+                                                        initiationBlock: receipt.blockNumber,
+                                                        expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                    });
                                                 });
-                                            });
+                                            } else {
+                                                reject(new Error('There was a problem adding new contract'));
+                                            }
                                         } else {
-                                            reject(new Error('There was a problem adding new contract'));
+                                            reject(error);
                                         }
-                                    } else {
-                                        reject(error);
-                                    }
+                                    });
                                 });
-                            });
+                            } else {
+                                reject(new Error('ethoFS User Not Found'));
+                            }
                         } else {
-                            reject(new Error('ethoFS User Not Found'));
+                            reject(new Error('Ether-1 RPC Access Error: ${error}'));
                         }
-                    } else {
-                        reject(new Error('Ether-1 RPC Access Error: ${error}'));
-                    }
+                    });
                 });
             });
         }

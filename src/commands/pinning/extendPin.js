@@ -1,11 +1,10 @@
-import { baseUrl, hostingCost, controllerContractAddress, controllerABI } from './../../constants';
+import { baseUrl, controllerContractAddress, controllerABI, configContractAddress, configContractABI } from './../../constants';
 import { validateEthofsKey, validateEthofsOptions } from '../../util/validators';
 import Web3 from 'web3';
 
 export default function extendPin(ethofsKey, hostingContractAddress, options) {
 
     var web3 = new Web3(`${baseUrl}`);
-    var hostingCostWei = hostingCost * 1000000000000000000;
 
     validateEthofsKey(ethofsKey);
 
@@ -52,6 +51,13 @@ export default function extendPin(ethofsKey, hostingContractAddress, options) {
         return await ethofsContract.methods.GetHostingContractStorageUsed(hostingContractAddress).call();
     };
 
+    async function getEthofsUploadCost() {
+
+        var ethofsConfig = new web3.eth.Contract(configContractABI, configContractAddress);
+
+        return await ethofsConfig.methods.uintMap(0).call();
+    };
+
     return new Promise((resolve, reject) => {
 
         web3.eth.net.isListening()
@@ -66,43 +72,46 @@ export default function extendPin(ethofsKey, hostingContractAddress, options) {
 
             getEthofsContentSize(ethofsContract, hostingContractAddress).then((result) => {
 
-                var extensionCost = calculateContractCost(result, options.ethofsOptions.hostingContractDuration, hostingCostWei);
+                getEthofsUploadCost().then((hostingCost) => {
 
-                const tx = {
-                    to: controllerContractAddress,
-                    from: web3.eth.defaultAccount,
-                    value: extensionCost,
-                    gas: 6000000,
-                    data: ethofsContract.methods.ExtendContract(hostingContractAddress, options.ethofsOptions.hostingContractDuration).encodeABI()
-                };
+                    var extensionCost = calculateContractCost(result, options.ethofsOptions.hostingContractDuration, hostingCost);
 
-                ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
-                    if (!error) {
-                        if (ethofsResult) {
-                            web3.eth.accounts.signTransaction(tx, privateKey)
-                            .then(function (signedTransactionData) {
-                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
-                                    if (!error) {
-                                        if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt) {
-                                                resolve({
-                                                    ethoTxHash: ethoResult
+                    const tx = {
+                        to: controllerContractAddress,
+                        from: web3.eth.defaultAccount,
+                        value: extensionCost,
+                        gas: 6000000,
+                        data: ethofsContract.methods.ExtendContract(hostingContractAddress, options.ethofsOptions.hostingContractDuration).encodeABI()
+                    };
+
+                    ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
+                        if (!error) {
+                            if (ethofsResult) {
+                                web3.eth.accounts.signTransaction(tx, privateKey)
+                                .then(function (signedTransactionData) {
+                                    web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
+                                        if (!error) {
+                                            if (ethoResult) {
+                                                waitForReceipt(ethoResult, function (receipt) {
+                                                    resolve({
+                                                        ethoTxHash: ethoResult
+                                                    });
                                                 });
-                                            });
+                                            } else {
+                                                reject(new Error('There was a problem extending hosting contract'));
+                                            }
                                         } else {
-                                            reject(new Error('There was a problem extending hosting contract'));
+                                            reject(error);
                                         }
-                                    } else {
-                                        reject(error);
-                                    }
+                                    });
                                 });
-                            });
+                            } else {
+                                reject(new Error('ethoFS User Not Found'));
+                            }
                         } else {
-                            reject(new Error('ethoFS User Not Found'));
+                            reject(new Error('Ether-1 RPC Access Error: ${error}'));
                         }
-                    } else {
-                        reject(new Error('Ether-1 RPC Access Error: ${error}'));
-                    }
+                    });
                 });
             });
         }).catch((error) => {

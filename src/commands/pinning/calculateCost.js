@@ -1,9 +1,10 @@
-import { hostingCost } from './../../constants';
+import { baseUrl, configContractAddress, configContractABI } from './../../constants';
 import { validateEthofsOptions } from '../../util/validators';
+import Web3 from 'web3';
 
 export default function calculateCost(options) {
 
-    var hostingCostWei = hostingCost * 1000000000000000000;
+    var web3 = new Web3(`${baseUrl}`);
 
     if (!options || !options.ethofsOptions || !options.ethofsOptions.hostingContractSize || !options.ethofsOptions.hostingContractDuration) {
         throw new Error('Properly formatted ethofs options containing hostingContractSize and hostingContractDuration required');
@@ -21,14 +22,25 @@ export default function calculateCost(options) {
         return Math.round(cost);
     }
 
+     async function getEthofsUploadCost() {
+
+        var ethofsConfig = new web3.eth.Contract(configContractABI, configContractAddress);
+
+        return await ethofsConfig.methods.uintMap(0).call();
+    };
+
     return new Promise((resolve, reject) => {
 
-        let costEstimate = calculateContractCost(options.ethofsOptions.hostingContractSize, options.ethofsOptions.hostingContractDuration, hostingCostWei);
+        getEthofsUploadCost().then((hostingCost) => {
 
-        resolve({
-            uploadSize: options.ethofsOptions.hostingContractSize,
-            uploadDuration: options.ethofsOptions.hostingContractDuration,
-            uploadCost: costEstimate
+            let costEstimate = calculateContractCost((options.ethofsOptions.hostingContractSize + 8), options.ethofsOptions.hostingContractDuration, hostingCost);
+
+            resolve({
+                uploadSize: options.ethofsOptions.hostingContractSize,
+                uploadDuration: options.ethofsOptions.hostingContractDuration,
+                uploadCost: costEstimate
+            });
         });
+
     });
 }

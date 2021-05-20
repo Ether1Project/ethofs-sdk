@@ -1,14 +1,14 @@
 <div class="bg-gray-dark">
-<img src="https://ethofs.com/index/images/logo.png" width="200" />
+<img src="https://github.com/Ether1Project/Ether-1-Branding/raw/master/PNG%20Logos/ethoProtocolBlack.png" width="200" />
 </div>
 
 # ethoFS SDK
 
-Official NodeJS SDK for [ethoFS](https://ethofs.com)
+Official NodeJS SDK for [ethoFS](https://ethoprotocol.com)
 
 ## Overview
 
-The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [ethoFS Network](https://docs.ether1.org/ethofs/ethofs-introduction).
+The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [Etho Protocol Network](https://docs.ethoprotocol.com/ethofs/ethofs-introduction).
 
 ## Installation
 ```
@@ -16,7 +16,7 @@ npm install --save @ethofs/sdk
 ```
 
 ## Setup
-To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key. Register a new upload address: [ethoFS Uploads](https://ethofs.com/uploads.html).
+To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key (Etho Protocol Key). Register a new upload address using the addUser function or by registering at: [Etho Protocol Uploads](https://uploads.ethoprotocol.com).
 
 ## Initialization Without Authentication
 ```javascript
@@ -27,6 +27,15 @@ const ethofs = ethofsSDK();
 ```javascript
 const ethofsSDK = require('@ethofs/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey');
+```
+## Initialization With Custom RPC/Gateway Locations
+```javascript
+const connections = {
+    rpc: 'https://rpc.ethoprotocol.com',
+    gateway: 'https://gateway.ethoprotocol.com'
+};
+const ethofsSDK = require('@ethofs/sdk');
+const ethofs = ethofsSDK('yourETHOPrivateKey', connections);
 ```
 
 Quickly test that you can connect to the API with the following call:

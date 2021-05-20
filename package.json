@@ -1,7 +1,7 @@
 {
   "name": "@ethofs/sdk",
-  "version": "1.0.9",
-  "description": "Official SDK for the ethoFS Platform",
+  "version": "1.0.10",
+  "description": "Official SDK for the ethoFS Platform and Etho Protocol Network",
   "main": "lib/ethofs-sdk.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",

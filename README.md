@@ -29,6 +29,9 @@ const ethofsSDK = require('@ethofs/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey');
 ```
 ## Initialization With Custom RPC/Gateway Locations
+rpc: Etho Protocol RPC Location
+gateway: IPFS API/Gateway Location
+
 ```javascript
 const connections = {
     rpc: 'https://rpc.ethoprotocol.com',

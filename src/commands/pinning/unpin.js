@@ -1,12 +1,22 @@
 import { baseUrl, controllerContractAddress, controllerABI } from './../../constants';
-import { validateEthofsKey } from '../../util/validators';
+import { validateEthofsKey, validateEthofsConnections } from '../../util/validators';
 import Web3 from 'web3';
 
-export default function unpin(ethofsKey, hostingContractAddress) {
+export default function unpin(ethofsKey, hostingContractAddress, connections) {
 
-    var web3 = new Web3(`${baseUrl}`);
+    var endpoint = `${baseUrl}`;
 
     validateEthofsKey(ethofsKey);
+
+    if (connections) {
+        validateEthofsConnections(connections);
+    }
+
+    if (connections && connections.rpc) {
+        endpoint = connections.rpc;
+    }
+
+    const web3 = new Web3(endpoint);
 
     if (!hostingContractAddress) {
         throw new Error('hostingContractAddress value is required for removing an upload contract from ethoFS');

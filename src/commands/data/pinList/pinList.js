@@ -1,16 +1,22 @@
-import { validateEthofsKey, validateEthofsDataFilter } from '../../../util/validators';
+import { validateEthofsKey, validateEthofsDataFilter, validateEthofsConnections } from '../../../util/validators';
 import { baseUrl, controllerContractAddress, controllerABI } from '../../../constants';
 import Web3 from 'web3';
 
 export default function pinList(ethofsKey, options) {
 
-    var web3 = new Web3(`${baseUrl}`);
+    var endpoint = `${baseUrl}`;
 
     validateEthofsKey(ethofsKey);
 
     if (options) {
         if (options.ethofsDataFilter) {
             validateEthofsDataFilter(options.ethofsDataFilter);
+        }
+        if (options.connections) {
+            validateEthofsConnections(options.connections);
+            if (options.connections.rpc) {
+                endpoint = options.connections.rpc;
+            }
         }
     }
 
@@ -28,6 +34,8 @@ export default function pinList(ethofsKey, options) {
     };
 
     return new Promise((resolve, reject) => {
+
+        var web3 = new Web3(endpoint);
 
         web3.eth.net.isListening()
             .then(function () {

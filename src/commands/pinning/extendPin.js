@@ -1,12 +1,20 @@
 import { baseUrl, controllerContractAddress, controllerABI, configContractAddress, configContractABI } from './../../constants';
-import { validateEthofsKey, validateEthofsOptions } from '../../util/validators';
+import { validateEthofsKey, validateEthofsOptions, validateEthofsConnections } from '../../util/validators';
 import Web3 from 'web3';
 
 export default function extendPin(ethofsKey, hostingContractAddress, options) {
 
-    var web3 = new Web3(`${baseUrl}`);
+    var endpoint = `${baseUrl}`;
 
     validateEthofsKey(ethofsKey);
+
+    if (options && options.connections) {
+        validateEthofsConnections(options.connections);
+    }
+
+    if (options && options.connections && options.connections.rpc) {
+        endpoint = options.connections.rpc;
+    }
 
     if (!hostingContractAddress) {
         throw new Error('hostingContractAddress value is required for removing an upload contract from ethoFS');
@@ -17,6 +25,8 @@ export default function extendPin(ethofsKey, hostingContractAddress, options) {
             validateEthofsOptions(options.ethofsOptions);
         }
     }
+
+    const web3 = new Web3(endpoint);
 
     function waitForReceipt(hash, cb) {
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {

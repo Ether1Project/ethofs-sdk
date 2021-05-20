@@ -1,16 +1,26 @@
 import { baseUrl, controllerContractAddress, controllerABI } from './../../constants';
-import { validateEthofsKey } from '../../util/validators';
+import { validateEthofsKey, validateEthofsConnections } from '../../util/validators';
 import Web3 from 'web3';
 
-export default function addUser(ethofsKey, userName) {
+export default function addUser(ethofsKey, userName, connections) {
 
-    var web3 = new Web3(`${baseUrl}`);
+    var endpoint = `${baseUrl}`;
 
     validateEthofsKey(ethofsKey);
+
+    if (connections) {
+        validateEthofsConnections(connections);
+    }
+
+    if (connections && connections.rpc) {
+        endpoint = connections.rpc;
+    }
 
     if (!userName) {
         throw new Error('User name is required for registering a new ethoFS upload address');
     }
+
+    const web3 = new Web3(endpoint);
 
     function waitForReceipt(hash, cb) {
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {

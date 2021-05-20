@@ -1,10 +1,18 @@
 import { baseUrl, configContractAddress, configContractABI } from './../../constants';
-import { validateEthofsOptions } from '../../util/validators';
+import { validateEthofsOptions, validateEthofsConnections } from '../../util/validators';
 import Web3 from 'web3';
 
 export default function calculateCost(options) {
 
-    var web3 = new Web3(`${baseUrl}`);
+    var endpoint = `${baseUrl}`;
+
+    if (options && options.connections) {
+        validateEthofsConnections(options.connections);
+    }
+
+    if (options && options.connections && options.connections.rpc) {
+        endpoint = options.connections.rpc;
+    }
 
     if (!options || !options.ethofsOptions || !options.ethofsOptions.hostingContractSize || !options.ethofsOptions.hostingContractDuration) {
         throw new Error('Properly formatted ethofs options containing hostingContractSize and hostingContractDuration required');
@@ -24,6 +32,7 @@ export default function calculateCost(options) {
 
      async function getEthofsUploadCost() {
 
+        var web3 = new Web3(endpoint);
         var ethofsConfig = new web3.eth.Contract(configContractABI, configContractAddress);
 
         return await ethofsConfig.methods.uintMap(0).call();

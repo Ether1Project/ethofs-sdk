@@ -10,33 +10,123 @@ import networkStats from './commands/data/networkStats/networkStats';
 import nodeLocations from './commands/data/networkStats/nodeLocations';
 import addUser from './commands/user/addUser';
 
-export default function ethofsClient(ethofsKey) {
+export default function ethofsClient(ethofsKey, connections) {
     let client = {};
 
     //  setting up the actual calls you can make using this package
     client.pinFileToIPFS = function (readableStream, options) {
-        return pinFileToIPFS(ethofsKey, readableStream, options);
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return pinFileToIPFS(ethofsKey, readableStream, config);
     };
     client.pinFolderToIPFS = function (readableStream, options) {
-        return pinFolderToIPFS(ethofsKey, readableStream, options);
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return pinFolderToIPFS(ethofsKey, readableStream, config);
     };
     client.pinFromFS = function (sourcePath, options) {
-        return pinFromFS(ethofsKey, sourcePath, options);
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return pinFromFS(ethofsKey, sourcePath, config);
     };
     client.unpin = function (uploadContractAddress) {
-        return unpin(ethofsKey, uploadContractAddress);
+        return unpin(ethofsKey, uploadContractAddress, connections);
     };
     client.extendPin = function (uploadContractAddress, options) {
-        return extendPin(ethofsKey, uploadContractAddress, options);
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return extendPin(ethofsKey, uploadContractAddress, config);
     };
     client.calculateCost = function (options) {
-        return calculateCost(options);
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return calculateCost(config);
     };
     client.testAuthentication = function () {
-        return testAuthentication(ethofsKey);
+        return testAuthentication(ethofsKey, connections);
     };
-    client.pinList = function (filters) {
-        return pinList(ethofsKey, filters);
+    client.pinList = function (options) {
+
+        var config;
+
+        if (connections) {
+            if (options) {
+                options.connections = connections;
+                config = options;
+            } else {
+              config = {
+                  connections: connections
+              };
+            }
+        } else {
+            config = options;
+        }
+        return pinList(ethofsKey, config);
     };
     client.networkStats = function () {
         return networkStats();
@@ -45,7 +135,7 @@ export default function ethofsClient(ethofsKey) {
         return nodeLocations();
     };
     client.addUser = function (userName) {
-        return addUser(ethofsKey, userName);
+        return addUser(ethofsKey, userName, connections);
     };
     return client;
 }

@@ -1,17 +1,32 @@
 import ipfsClient from 'ipfs-http-client';
 import { apiBaseUrl, baseUrl, controllerContractAddress, controllerABI, configContractAddress, configContractABI } from './../../constants';
-import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
+import { validateEthofsKey, validateEthofsData, validateEthofsOptions, validateEthofsConnections } from '../../util/validators';
 import Web3 from 'web3';
 
 export default function pinFileToIPFS(ethofsKey, readStream, options) {
 
-    var web3 = new Web3(`${baseUrl}`);
     var data;
+    var endpoint = `${baseUrl}`;
+    var apiEndpoint = `${apiBaseUrl}`;
 
     validateEthofsKey(ethofsKey);
 
-    const apiEndpoint = `${apiBaseUrl}`;
-    const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
+    if (options && options.connections) {
+        validateEthofsConnections(options.connections);
+    }
+
+    if (options && options.connections) {
+        if (options.connections.rpc) {
+            endpoint = options.connections.rpc;
+        }
+        if (options.connections.gateway) {
+            apiEndpoint = options.connections.gateway;
+        }
+    }
+
+    //const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
+    const ipfs = ipfsClient(apiEndpoint);
+    const web3 = new Web3(endpoint);
 
     if (options) {
         if (options.ethofsData) {

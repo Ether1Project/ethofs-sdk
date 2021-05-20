@@ -32,7 +32,7 @@ const ethofs = ethofsSDK('yourETHOPrivateKey');
 ##### Params
 * `connections` : A JSON object that contains the following keyvalues:
   * `rpc` (optional) : The Etho Protocol RPC Location
-  * `ethofsOptions` (optional) : The IPFS API/Gateway Location
+  * `gateway` (optional) : The IPFS API/Gateway Location
 ##### Example Code
 ```javascript
 const connections = {

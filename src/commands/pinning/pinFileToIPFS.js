@@ -20,15 +20,11 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
         }
     }
 
-    async function uploadToIPFS(readStream) {
-        return await ipfs.add(readStream);
-    };
-
     return new Promise((resolve, reject) => {
         client.accountExists()
             .then((exists) => {
                 if (exists) {
-                    uploadToIPFS(readStream)
+                    ipfs.add(readStream)
                         .then((result) => {
                             const contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
                             const contentPathString = 'ethoFSPinningChannel_alpha11:';
@@ -50,16 +46,16 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
 
                                     const sendReceipt = (txHash) => {
                                         waitForReceipt(client, txHash)
-                                        .then((result) => {
-                                            resolve(Object.assign(result, {
-                                                ethoTxHash: result.transactionHash,
-                                                ipfsHash: result.path,
-                                                uploadCost: uploadCost,
-                                                initiationBlock: result.blockNumber,
-                                                expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
-                                            }));
-                                        })
-                                        .catch(reject);
+                                            .then((result) => {
+                                                resolve(Object.assign(result, {
+                                                    ethoTxHash: result.transactionHash,
+                                                    ipfsHash: result.path,
+                                                    uploadCost: uploadCost,
+                                                    initiationBlock: result.blockNumber,
+                                                    expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                }));
+                                            })
+                                            .catch(reject);
                                     };
 
                                     if (client.metamask) {

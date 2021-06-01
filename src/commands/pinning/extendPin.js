@@ -15,15 +15,11 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
         }
     }
 
-    async function getEthofsContentSize(ethofsContract, hostingContractAddress) {
-        return await ethofsContract.methods.GetHostingContractStorageUsed(hostingContractAddress).call();
-    };
-
     return new Promise((resolve, reject) => {
         client.accountExists()
             .then((exists) => {
                 if (exists) {
-                    getEthofsContentSize(client.ethoFSContract, hostingContractAddress)
+                    client.ethoFSContract.methods.GetHostingContractStorageUsed(hostingContractAddress).call()
                         .then((result) => {
                             client.calculateCost({
                                 ethofsOptions: {

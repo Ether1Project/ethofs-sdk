@@ -25,15 +25,11 @@ module.exports = function pinFolderToIPFS(client, privateKey, readStream, option
         }
     }
 
-    async function uploadToIPFS(readStream) {
-        return await ipfs.add(readStream);
-    };
-
     return new Promise((resolve, reject) => {
         client.accountExists()
             .then((exists) => {
                 if (exists) {
-                    uploadToIPFS(readStream)
+                    ipfs.add(readStream)
                         .then((result) => {
                             var contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
                             var contentPathString = 'ethoFSPinningChannel_alpha11:';

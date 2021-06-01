@@ -12,11 +12,13 @@ module.exports = function calculateCost(options) {
         return Math.round(cost);
     };
 
-    const getEthofsUploadCost = async () => {
+    const getEthofsUploadCost = () => new Promise((resolve, reject) => {
         const ethofsConfig = new web3.eth.Contract(configContractABI, configContractAddress);
 
-        return await ethofsConfig.methods.uintMap(0).call();
-    };
+        ethofsConfig.methods.uintMap(0).call()
+            .then(resolve)
+            .catch(reject);
+    });
 
     if (!options || !options.ethofsOptions || !options.ethofsOptions.hostingContractSize || !options.ethofsOptions.hostingContractDuration) {
         throw new Error('Properly formatted ethofs options containing hostingContractSize and hostingContractDuration required');

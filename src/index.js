@@ -10,6 +10,7 @@ const networkStats = require('./commands/data/networkStats/networkStats');
 
 const accountExists = require('./commands/user/accountExists');
 const addUser = require('./commands/user/addUser');
+const updateUser = require('./commands/user/updateUser');
 const getBalance = require('./commands/data/getBalance');
 const sendEther = require('./commands/wallet/sendEther');
 const testAuthentication = require('./commands/data/testAuthentication');
@@ -84,6 +85,7 @@ const client = {
     // Work Only After Init
     accountExists: () => accountExists(client),
     addUser: (userName) => addUser(client, privateKey, userName),
+    updateUser: (userName) => updateUser(client, privateKey, userName),
     getBalance: () => getBalance(client),
     getWalletAddress: () => client.web3.eth.defaultAccount,
     sendEther: (options) => sendEther(client, privateKey, options),

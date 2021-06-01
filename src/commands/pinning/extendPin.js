@@ -42,14 +42,16 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
                                     };
 
                                     const sendReceipt = (txHash) => {
-                                        waitForReceipt(client, txHash, function (receipt) {
-                                            resolve({
-                                                ethoTxHash: txHash,
-                                                extensionCost,
-                                                initiationBlock: receipt.blockNumber,
-                                                expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
-                                            });
-                                        });
+                                        waitForReceipt(client, txHash)
+                                            .then((result) => {
+                                                resolve({
+                                                    ethoTxHash: result.transactionHash,
+                                                    extensionCost,
+                                                    initiationBlock: result.blockNumber,
+                                                    expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                });
+                                            })
+                                            .catch(reject);
                                     };
 
                                     if (client.metamask) {

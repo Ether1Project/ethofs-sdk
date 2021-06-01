@@ -49,15 +49,17 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
                                     };
 
                                     const sendReceipt = (txHash) => {
-                                        waitForReceipt(client, txHash, function (receipt) {
-                                            resolve({
+                                        waitForReceipt(client, txHash)
+                                        .then((result) => {
+                                            resolve(Object.assign(result, {
+                                                ethoTxHash: result.transactionHash,
                                                 ipfsHash: result.path,
-                                                ethoTxHash: txHash,
                                                 uploadCost: uploadCost,
-                                                initiationBlock: receipt.blockNumber,
-                                                expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
-                                            });
-                                        });
+                                                initiationBlock: result.blockNumber,
+                                                expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                            }));
+                                        })
+                                        .catch(reject);
                                     };
 
                                     if (client.metamask) {

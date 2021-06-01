@@ -9,7 +9,8 @@ module.exports = function accountExists(client) {
                 client.ethoFSContract.methods.CheckAccountExistence(client.web3.eth.defaultAccount).call((error, ethofsResult) => {
                     if (!error) resolve(ethofsResult);
                     else reject(new Error(`Ether-1 RPC Access Error: ${error}`));
-                });
+                })
+                .catch(console.log);
             })
             .catch(reject);
     });

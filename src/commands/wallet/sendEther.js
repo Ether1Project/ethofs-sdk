@@ -1,4 +1,5 @@
 const isInitialized = require('../../util/isInitialized');
+const waitForReceipt = require('../../util/waitForReciept');
 const signAndSendTx = require('../../util/signAndSendTx');
 
 module.exports = function sendEther(client, privateKey, options) {
@@ -24,18 +25,26 @@ module.exports = function sendEther(client, privateKey, options) {
                     networkId: '1313114'
                 };
 
+                const sendReceipt = (txHash) => {
+                    waitForReceipt(client, txHash)
+                        .then((result) => {
+                            resolve({
+                                ethoTxHash: result.transactionHash
+                            });
+                        })
+                        .catch(reject);
+                };
+
                 if (client.metamask) {
                     delete tx.gas;
-                    delete tx.chainId;
-                    delete tx.networkId;
 
-                    client.providerMM.request({ method: 'eth_signTransaction', params: tx})
-                        .then(resolve)
+                    client.providerMM.request({ method: 'eth_sendTransaction', params: [tx]})
+                        .then(sendReceipt)
                         .catch(reject);
 
                 } else {
                     signAndSendTx(client, tx, privateKey)
-                        .then(resolve)
+                        .then(sendReceipt)
                         .catch(reject);
                 }
             })

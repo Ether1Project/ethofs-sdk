@@ -43,11 +43,6 @@ document.addEventListener('click', (evt) => {
                 .then(console.log)
                 .catch(console.log);
             break;
-        case document.querySelector('#pinJobs'):
-            ethoFS.pinJobs()
-                .then(console.log)
-                .catch(console.log);
-            break;
 
         // Network
         case document.querySelector('#networkStats'):
@@ -76,14 +71,19 @@ document.addEventListener('click', (evt) => {
                     .catch(console.log);
             } else console.error('Please enter a valid user name');
             break;
-        case document.querySelector('#removeUser'):
-            const removeUser = document.querySelector('#userName').value.trim();
+        case document.querySelector('#updateUser'):
+            const updateUser = document.querySelector('#userName').value.trim();
 
-            if (removeUser !== '') {
-                ethoFS.removeUser(removeUser)
+            if (updateUser !== '') {
+                ethoFS.updateUser(updateUser)
                     .then(console.log)
                     .catch(console.log);
             } else console.error('Please enter a valid user name');
+            break;
+        case document.querySelector('#removeUser'):
+            ethoFS.removeUser()
+                .then(console.log)
+                .catch(console.log);
             break;
 
         // Pinning

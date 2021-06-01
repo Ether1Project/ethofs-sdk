@@ -54,15 +54,17 @@ module.exports = function pinFolderToIPFS(client, privateKey, readStream, option
                                     };
 
                                     const sendReceipt = (txHash) => {
-                                        waitForReceipt(client, txHash, function (receipt) {
-                                            resolve({
-                                                ipfsHash: bs58.encode(result.cid.multihash),
-                                                ethoTxHash: txHash,
-                                                uploadCost: uploadCost,
-                                                initiationBlock: receipt.blockNumber,
-                                                expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
-                                            });
-                                        });
+                                        waitForReceipt(client, txHash)
+                                            .then((result) => {
+                                                resolve(Object.assign(result, {
+                                                    ethoTxHash: result.transactionHash,
+                                                    ipfsHash: bs58.encode(result.cid.multihash),
+                                                    uploadCost: uploadCost,
+                                                    initiationBlock: result.blockNumber,
+                                                    expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                }));
+                                            })
+                                            .catch(reject);
                                     };
 
                                     if (client.metamask) {

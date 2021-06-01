@@ -7,27 +7,33 @@ module.exports = function unpin(client, privateKey, hostingContractAddress) {
     isInitialized(client);
     if (!hostingContractAddress) throw new Error('hostingContractAddress value is required for removing an upload contract from ethoFS');
 
-    async function getEthofsContentHash(ethofsContract) {
-        return await ethofsContract.methods.GetMainContentHash(hostingContractAddress).call();
-    };
+    const getEthofsContentHash = () => new Promise((resolve, reject) => {
+        client.ethoFSContract.methods.GetMainContentHash(hostingContractAddress).call()
+            .then(resolve)
+            .catch(reject);
+    });
 
     return new Promise((resolve, reject) => {
         client.accountExists()
             .then((exists) => {
                 if (exists) {
-                    getEthofsContentHash(client.ethoFSContract)
-                        .then((result) => {
+                    getEthofsContentHash()
+                        .then((ipfsHash) => {
                             const tx = {
                                 to: controllerContractAddress,
                                 from: client.web3.eth.defaultAccount,
                                 gas: '6000000',
-                                data: client.ethoFSContract.methods.RemoveHostingContract(hostingContractAddress, result).encodeABI()
+                                data: client.ethoFSContract.methods.RemoveHostingContract(hostingContractAddress, ipfsHash).encodeABI()
                             };
 
                             const sendReceipt = (txHash) => {
-                                waitForReceipt(client, txHash, function () {
-                                    resolve({ ethoTxHash: txHash });
-                                });
+                                waitForReceipt(client, txHash)
+                                    .then((result) => {
+                                        resolve({
+                                            ethoTxHash: result.transactionHash
+                                        });
+                                    })
+                                    .catch(reject);
                             };
 
                             if (client.metamask) {

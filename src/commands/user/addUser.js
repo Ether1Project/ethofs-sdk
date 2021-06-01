@@ -15,20 +15,24 @@ module.exports = function addUser(client, privateKey, userName) {
                     const tx = {
                         to: controllerContractAddress,
                         from: client.web3.eth.defaultAccount,
-                        gas: 3000000,
+                        gas: '3000000',
                         data: client.ethoFSContract.methods.AddNewUserPublic(userName).encodeABI()
                     };
 
                     const sendReceipt = (txHash) => {
-                        waitForReceipt(client, txHash, function () {
-                            resolve({ ethoTxHash: txHash });
-                        });
+                        waitForReceipt(client, txHash)
+                            .then((result) => {
+                                resolve({
+                                    ethoTxHash: result.transactionHash
+                                });
+                            })
+                            .catch(reject);
                     };
 
                     if (client.metamask) {
                         delete tx.gas;
 
-                        client.providerMM.request({ method: 'eth_signTransaction', params: tx})
+                        client.providerMM.request({ method: 'eth_sendTransaction', params: [tx]})
                             .then(sendReceipt)
                             .catch(reject);
 

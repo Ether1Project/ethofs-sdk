@@ -7,13 +7,13 @@ module.exports = function pinList(client, options) {
         }
     }
 
-    async function getEthofsUploadContract(ethofsContract, hostingContractAddress) {
+    async function getEthofsUploadContract(hostingContractAddress) {
         const contractData = {
             address: hostingContractAddress,
-            data: await ethofsContract.methods.GetHostingContractName(hostingContractAddress).call(),
-            ipfsHash: await ethofsContract.methods.GetMainContentHash(hostingContractAddress).call(),
-            initiationBlock: await ethofsContract.methods.GetHostingContractDeployedBlockHeight(hostingContractAddress).call(),
-            expirationBlock: await ethofsContract.methods.GetHostingContractExpirationBlockHeight(hostingContractAddress).call()
+            data: await client.ethoFSContract.methods.GetHostingContractName(hostingContractAddress).call(),
+            ipfsHash: await client.ethoFSContract.methods.GetMainContentHash(hostingContractAddress).call(),
+            initiationBlock: await client.ethoFSContract.methods.GetHostingContractDeployedBlockHeight(hostingContractAddress).call(),
+            expirationBlock: await client.ethoFSContract.methods.GetHostingContractExpirationBlockHeight(hostingContractAddress).call()
         };
 
         return await contractData;
@@ -37,7 +37,7 @@ module.exports = function pinList(client, options) {
                                 for (let contractIndex = 0; contractIndex < contractCount; contractIndex++) {
                                     client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, contractIndex).call()
                                         .then((hostingContractAddress) => {
-                                            getEthofsUploadContract(client.ethoFSContract, hostingContractAddress)
+                                            getEthofsUploadContract(hostingContractAddress)
                                                 .then((result) => {
                                                     if (result.expirationBlock === '0') expiredContractCount++;
                                                     else if (options && (options.ethofsDataFilter)) {
@@ -78,7 +78,8 @@ module.exports = function pinList(client, options) {
                                 }
                             } else reject(new Error('ethoFS User Not Found'));
                         } else reject(new Error(`Ether-1 RPC Access Error: ${error}`));
-                    });
+                    })
+                    .catch(console.log);
                 } else reject(new Error('ethoFS User Not Found'));
             })
             .catch(reject);

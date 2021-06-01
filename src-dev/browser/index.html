@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test App</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <h5 class="text-3xl">Please see console for result of each function and errors</h5>
+
+    <br>
+    <div class="flex justify-center">
+        <button class="bg-blue-100 border mx-1 p-1" id="mmInit">Metamask Init</button>
+        <div class="px-12">
+            <label for="">Private Key</label>
+            <input class="bg-gray-100" type="password" id="pk">
+            <button class="bg-green-100 border mx-1 p-1" id="pkInit">Private Key Init</button>
+        </div>
+    </div>
+
+    <br>
+    <div>
+        <h6 class="text-2xl">Authentication and Basic</h6>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="testAuthentication">Test Authentication</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="getBalance">Get Balance</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="getWalletAddress">Get Wallet Address</button>
+    </div>
+
+    <br>
+    <div>
+        <h6 class="text-2xl">Pin List</h6>
+        <label for="">Filter List (Optional)</label>
+        <input class="bg-gray-100" type="text" id="pinFilter">
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="pinList">Get Pin List</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="pinJobs">Get Pin Jobs</button>
+    </div>
+
+    <br>
+    <div>
+        <h6 class="text-2xl">Network</h6>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="networkStats">Network Stats</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="nodeLocations">Node Locations</button>
+    </div>
+    
+    <br>
+    <div>
+        <h6 class="text-2xl">User</h6>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="accountExists">Account Exists</button>
+        <br>
+        <label for="">Enter User Name (whithout spaces)</label>
+        <input class="bg-gray-100" type="text" id="userName">
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="addUser">Add User</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="removeUser">Remove User</button>
+    </div>
+    
+    <br>
+    <div>
+        <h6 class="text-2xl">Pinning</h6>
+        <label for="">Select File for Pinning</label>
+        <input class="bg-gray-100" type="file" id="file">
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="calculateCost">Calculate Cost</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="pinFileToIPFS">Pin File to IPFS</button>
+    </div>
+
+    <div>
+        <label for="">Enter Contract Name (to Unpin)</label>
+        <input class="bg-gray-100" type="text" id="pinAddress">
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="unpin">Unpin</button>
+        <button class="bg-blue-500 text-white border mx-1 p-1" id="extend">Extend Pin</button>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Common
+*.DS_Store*
+*.thumbs.db*
+*node_modules*
+
+# Log files
+*npm-debug.log
+*yarn-debug.log
+*yarn-error.log
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Package Install Files
+*yarn.lock
+*package-lock.json
+
+# Project Specific
+./src
+./src-dev
+./test
+.editorconfig
+.eslintrc
+.gitignore
+webpack.config.js

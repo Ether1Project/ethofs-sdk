@@ -1,13 +1,6 @@
-import { validateEthofsKey, validateEthofsDataFilter } from '../../../util/validators';
-import { baseUrl, controllerContractAddress, controllerABI } from '../../../constants';
-import Web3 from 'web3';
+const { validateEthofsDataFilter } = require('../../../util/validators');
 
-export default function pinList(ethofsKey, options) {
-
-    var web3 = new Web3(`${baseUrl}`);
-
-    validateEthofsKey(ethofsKey);
-
+module.exports = function pinList(client, options) {
     if (options) {
         if (options.ethofsDataFilter) {
             validateEthofsDataFilter(options.ethofsDataFilter);
@@ -15,7 +8,6 @@ export default function pinList(ethofsKey, options) {
     }
 
     async function getEthofsUploadContract(ethofsContract, hostingContractAddress) {
-
         const contractData = {
             address: hostingContractAddress,
             data: await ethofsContract.methods.GetHostingContractName(hostingContractAddress).call(),
@@ -28,91 +20,67 @@ export default function pinList(ethofsKey, options) {
     };
 
     return new Promise((resolve, reject) => {
+        client.accountExists()
+            .then((exists) => {
+                if (exists) {
+                    client.ethoFSContract.methods.GetUserAccountTotalContractCount(client.web3.eth.defaultAccount).call((error, contractCount) => {
+                        if (!error) {
+                            if (contractCount) {
+                                const uploadContractArray = [];
 
-        web3.eth.net.isListening()
-            .then(function () {
+                                let expiredContractCount = 0;
 
-            var account = web3.eth.accounts.privateKeyToAccount('0x' + ethofsKey);
-            var ethofsContract = new web3.eth.Contract(controllerABI, controllerContractAddress);
+                                let filteredContractCount = 0;
 
-            const uploadContractArray = [];
+                                if (contractCount === 0) resolve(uploadContractArray);
 
-            web3.eth.accounts.wallet.add(account);
-            web3.eth.defaultAccount = account.address;
+                                for (let contractIndex = 0; contractIndex < contractCount; contractIndex++) {
+                                    client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, contractIndex).call()
+                                        .then((hostingContractAddress) => {
+                                            getEthofsUploadContract(client.ethoFSContract, hostingContractAddress)
+                                                .then((result) => {
+                                                    if (result.expirationBlock === '0') expiredContractCount++;
+                                                    else if (options && (options.ethofsDataFilter)) {
+                                                        let filteredContract = false;
 
-            ethofsContract.methods.GetUserAccountTotalContractCount(web3.eth.defaultAccount).call(function (error, contractCount) {
-                if (!error) {
-                    if (contractCount) {
+                                                        try {
+                                                            const data = JSON.parse(result.data);
 
-                        let expiredContractCount = 0;
+                                                            for (const property in options.ethofsDataFilter) {
+                                                                if (filteredContract) break;
 
-                        let filteredContractCount = 0;
+                                                                if (String(options.ethofsDataFilter[property]) === String(data[property])) {
+                                                                    uploadContractArray.push(result);
+                                                                    filteredContract = true;
+                                                                    break;
+                                                                } else {
+                                                                    for (const key in options.property) {
+                                                                        if (String(options.ethofsDataFilter[property][key]) === String(data[property][key])) {
+                                                                            uploadContractArray.push(result);
+                                                                            filteredContract = true;
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } catch {}
 
-                        if (contractCount === 0) {
-                            resolve(uploadContractArray);
-                        }
+                                                        if (!filteredContract) filteredContractCount++;
+                                                    } else uploadContractArray.push(result);
 
-                        for (let contractIndex = 0; contractIndex < contractCount; contractIndex++) {
-
-                            ethofsContract.methods.GetHostingContractAddress(web3.eth.defaultAccount, contractIndex).call().then((hostingContractAddress) => {
-                                getEthofsUploadContract(ethofsContract, hostingContractAddress).then((result) => {
-                                    if (result.expirationBlock === '0') { // contract is deleted/expired
-
-                                        expiredContractCount++;
-
-                                    } else if (options && (options.ethofsDataFilter)) {
-
-                                        let filteredContract = false;
-
-                                        let data;
-
-                                        try {
-                                            data = JSON.parse(result.data);
-
-                                            for (const property in options.ethofsDataFilter) {
-                                                if (filteredContract) { break; }
-                                                if (`${options.ethofsDataFilter[property]}` === `${data[property]}`) {
-                                                    uploadContractArray.push(result);
-                                                    filteredContract = true;
-                                                    break;
-                                                } else {
-                                                    for (const key in options.property) {
-                                                        if (`${options.ethofsDataFilter[property][key]}` === `${data[property][key]}`) {
-                                                            uploadContractArray.push(result);
-                                                            filteredContract = true;
-                                                            break;
-                                                        }
+                                                    if (uploadContractArray.length >= (contractCount - (expiredContractCount + filteredContractCount))) {
+                                                        resolve(uploadContractArray);
                                                     }
-                                                }
-                                            }
-                                        } catch (e) {
+                                                });
+                                        })
+                                        .catch(reject);
 
-                                        }
-
-                                        if (!filteredContract) {
-                                            filteredContractCount++;
-                                        }
-                                    } else {
-
-                                        uploadContractArray.push(result);
-
-                                    }
-
-                                    if (uploadContractArray.length >= (contractCount - (expiredContractCount + filteredContractCount))) {
-
-                                        resolve(uploadContractArray);
-                                    }
-                                });
-                            });
-
-                        }
-                    } else {
-                        reject(new Error('ethoFS User Not Found'));
-                    }
-                } else {
-                    reject(new Error('Ether-1 RPC Access Error: ${error}'));
-                }
-            });
-        });
+                                }
+                            } else reject(new Error('ethoFS User Not Found'));
+                        } else reject(new Error(`Ether-1 RPC Access Error: ${error}`));
+                    });
+                } else reject(new Error('ethoFS User Not Found'));
+            })
+            .catch(reject);
     });
-}
+};

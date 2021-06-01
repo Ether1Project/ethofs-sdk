@@ -1,10 +1,10 @@
-export function validateEthofsKey(ethofsKey) {
-    if (!ethofsKey || ethofsKey === '') {
+module.exports.validateEthofsKey = (ethofsKey) => {
+    if (!ethofsKey || String(ethofsKey).trim() === '') {
         throw new Error('No ethoFS private key provided! Please provide your ethoFS private key as an argument when you start this script');
     }
-}
+};
 
-export function validateEthofsDataFilter(data) {
+module.exports.validateEthofsDataFilter = (data) => {
     if (data.name) {
         if (!(typeof data.name === 'string' || data.name instanceof String)) {
             throw new Error('ethofsData name must be of type string');
@@ -29,9 +29,9 @@ export function validateEthofsDataFilter(data) {
             i++;
         });
     }
-}
+};
 
-export function validateEthofsData(data) {
+module.exports.validateEthofsData = (data) => {
     if (data.name) {
         if (!(typeof data.name === 'string' || data.name instanceof String)) {
             throw new Error('ethofsData name must be of type string');
@@ -56,9 +56,9 @@ export function validateEthofsData(data) {
             i++;
         });
     }
-}
+};
 
-export function validateEthofsOptions(options) {
+module.exports.validateEthofsOptions = (options) => {
     if (typeof options !== 'object') {
         throw new Error('options must be an object');
     }
@@ -74,4 +74,4 @@ export function validateEthofsOptions(options) {
             throw new Error('incorrect hosting contract size');
         }
     }
-}
+};

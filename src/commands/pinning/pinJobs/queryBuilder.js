@@ -1,13 +1,9 @@
-import isIPFS from 'is-ipfs';
+const isIPFS = require('is-ipfs');
 
-export default function queryBuilder(baseUrl, filters) {
-    if (!baseUrl) {
-        throw new Error('no baseUrl provided');
-    }
+module.exports = function queryBuilder(baseUrl, filters) {
+    if (!baseUrl) throw new Error('no baseUrl provided');
 
-    if (!filters) {
-        return baseUrl;
-    }
+    if (!filters) return baseUrl;
 
     let newUrl = baseUrl;
 
@@ -72,4 +68,4 @@ export default function queryBuilder(baseUrl, filters) {
         }
     }
     return newUrl;
-}
+};

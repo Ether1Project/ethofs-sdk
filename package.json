@@ -1,12 +1,13 @@
 {
   "name": "@ethofs/sdk",
-  "version": "1.0.2",
+  "version": "1.0.9",
   "description": "Official SDK for the ethoFS Platform",
   "main": "lib/ethofs-sdk.js",
   "scripts": {
-    "build": "webpack --env dev && webpack --env build && npm run test",
+    "build": "webpack --env mode=development && webpack --env mode=production",
     "coverage": "jest --coverage",
-    "dev": "webpack --progress --colors --watch --env dev",
+    "dev-web": "webpack serve --env mode=development dev=web",
+    "dev-node": "node ./src-dev/node/index.js",
     "html": "open coverage/index.html",
     "lint": "eslint src --quiet ",
     "lint:fix": "eslint src --fix",
@@ -33,38 +34,29 @@
   },
   "homepage": "https://github.com/Ether1Project/ethofs-sdk",
   "devDependencies": {
-    "@babel/cli": "^7.12.8",
-    "@babel/core": "^7.12.9",
-    "@babel/preset-env": "^7.12.7",
-    "@babel/register": "^7.12.1",
-    "acorn": "^7.4.1",
-    "babel-eslint": "^10.0.3",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
-    "babel-plugin-add-module-exports": "^1.0.4",
-    "babel-polyfill": "^6.26.0",
-    "eslint": "^6.8.0",
-    "eslint-loader": "^3.0.4",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "electron": "^13.0.1",
+    "eslint": "^7.27.0",
+    "eslint-loader": "^4.0.2",
+    "html-webpack-plugin": "^4.5.2",
     "jest": "^25.5.4",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12",
-    "yargs": "^10.0.3"
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "axios": "^0.18.1",
-    "base-path-converter": "^1.0.2",
-    "bl": "^4.0.3",
+    "@metamask/detect-provider": "^1.2.0",
+    "axios": "^0.21.1",
     "bs58": "^4.0.1",
-    "buffer": "^6.0.3",
-    "electron": "^11.0.3",
-    "form-data": "^2.3.3",
-    "fs": "0.0.1-security",
     "ipfs-http-client": "^48.1.2",
     "is-ipfs": "^0.6.0",
-    "recursive-fs": "^1.1.2",
-    "swarm-js": "^0.1.40",
-    "web3": "^1.3.0"
+    "web3": "^1.3.6"
   },
+  "browserslist": [
+    "last 5 version, not dead"
+  ],
   "jest": {
     "collectCoverage": true,
     "coverageReporters": [

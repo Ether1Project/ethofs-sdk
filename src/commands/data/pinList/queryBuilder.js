@@ -12,7 +12,7 @@ function validateAndReturnDate(dateToValidate) {
     }
 }
 
-export default function queryBuilder(baseUrl, filters) {
+module.exports = function queryBuilder(baseUrl, filters) {
     if (!baseUrl) {
         throw new Error('no baseUrl provided');
     }
@@ -230,5 +230,5 @@ export default function queryBuilder(baseUrl, filters) {
         }
     }
     return `${baseUrl}${filterQuery}${metadataQuery}`;
-}
+};
 

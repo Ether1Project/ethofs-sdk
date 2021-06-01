@@ -1,9 +1,9 @@
-import { validateEthofsKey } from '../../util/validators';
+const { validateEthofsKey } = require('../../util/validators');
 
-export default function userPinnedDataTotal(ethofsKey) {
+module.exports = function userPinnedDataTotal(ethofsKey) {
     validateEthofsKey(ethofsKey);
 
     return new Promise((resolve, reject) => {
         reject(new Error('ethoFS pinned data retrieval not yet functional'));
     });
-}
+};

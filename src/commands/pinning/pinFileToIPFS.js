@@ -1,20 +1,16 @@
-import ipfsClient from 'ipfs-http-client';
-import { apiBaseUrl, baseUrl, controllerContractAddress, controllerABI } from './../../constants';
-import stream from 'stream';
-import { validateEthofsKey, validateEthofsData, validateEthofsOptions } from '../../util/validators';
-import Web3 from 'web3';
+const ipfsClient = require('ipfs-http-client');
 
-export default function pinFileToIPFS(ethofsKey, readStream, options) {
+const { apiBaseUrl, controllerContractAddress } = require('./../../constants');
+const { validateEthofsData } = require('../../util/validators');
+const isInitialized = require('../../util/isInitialized');
+const waitForReceipt = require('../../util/waitForReciept');
+const signAndSendTx = require('../../util/signAndSendTx');
 
-    var web3 = new Web3(`${baseUrl}`);
-    var minimumContractCost = 10000000000000000;
-    var hostingCost = 1.0;
-    var hostingCostWei = hostingCost * 1000000000000000000;
-    var data;
+module.exports = function pinFileToIPFS(client, privateKey, readStream, options) {
+    isInitialized(client);
 
-    validateEthofsKey(ethofsKey);
-
-    const apiEndpoint = `${apiBaseUrl}`;
+    let data;
+    const apiEndpoint = apiBaseUrl;
     const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
 
     if (options) {
@@ -22,108 +18,65 @@ export default function pinFileToIPFS(ethofsKey, readStream, options) {
             validateEthofsData(options.ethofsData);
             data = JSON.stringify(options.ethofsData);
         }
-        if (options.ethofsOptions) {
-            validateEthofsOptions(options.ethofsOptions);
-        }
     }
 
     async function uploadToIPFS(readStream) {
-
         return await ipfs.add(readStream);
-
     };
-    function waitForReceipt(hash, cb) {
-        web3.eth.getTransactionReceipt(hash, function (err, receipt) {
-            web3.eth.getBlock('latest', function (e, res) {
-                if (!e) {
-                }
-            });
-            if (err) {
-                console.log('Error connecting to Ether-1 Network: ' + err);
-                console.error(err);
-            }
-            if (receipt !== null) {
-                if (cb) {
-                    cb(receipt);
-                }
-            } else {
-                setTimeout(function () {
-                    waitForReceipt(hash, cb);
-                }, 5000);
-            }
-        });
-    }
-    function calculateContractCost(contractSize, contractDuration, hostingCost) {
-        var cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
-
-        if (cost < minimumContractCost) {
-            cost = minimumContractCost;
-        }
-        return cost;
-    }
 
     return new Promise((resolve, reject) => {
+        client.accountExists()
+            .then((exists) => {
+                if (exists) {
+                    uploadToIPFS(readStream)
+                        .then((result) => {
+                            const contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
+                            const contentPathString = 'ethoFSPinningChannel_alpha11:';
 
-        if (!(readStream instanceof stream.Readable)) {
-            reject(new Error('readStream is not a readable stream'));
-        }
+                            client.calculateCost({
+                                ethofsOptions: {
+                                    hostingContractDuration: options.ethofsOptions.hostingContractDuration,
+                                    hostingContractSize: result.size
+                                }
+                            })
+                                .then(({ uploadCost }) => {
+                                    const tx = {
+                                        to: controllerContractAddress,
+                                        from: client.web3.eth.defaultAccount,
+                                        value: String(uploadCost),
+                                        gas: '6000000',
+                                        data: client.ethoFSContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
+                                    };
 
-        uploadToIPFS(readStream).then((result) => {
-
-            web3.eth.net.isListening()
-            .then(function () {
-
-                var account = web3.eth.accounts.privateKeyToAccount('0x' + ethofsKey);
-                var privateKey = '0x' + ethofsKey;
-                var ethofsContract = new web3.eth.Contract(controllerABI, controllerContractAddress);
-                var contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
-                var contentPathString = 'ethoFSPinningChannel_alpha11:';
-                var contractCost = calculateContractCost(result.size, options.ethofsOptions.hostingContractDuration, hostingCostWei);
-
-                web3.eth.accounts.wallet.add(account);
-                web3.eth.defaultAccount = account.address;
-
-                const tx = {
-                    to: controllerContractAddress,
-                    from: web3.eth.defaultAccount,
-                    value: contractCost,
-                    gas: 6000000,
-                    data: ethofsContract.methods.AddNewContract(result.path.toString(), data, options.ethofsOptions.hostingContractDuration, result.size.toString(), result.size.toString(), contentHashString, contentPathString).encodeABI()
-                };
-
-                ethofsContract.methods.CheckAccountExistence(web3.eth.defaultAccount).call(function (error, ethofsResult) {
-                    if (!error) {
-                        if (ethofsResult) {
-                            web3.eth.accounts.signTransaction(tx, privateKey)
-                            .then(function (signedTransactionData) {
-                                web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction, function (error, ethoResult) {
-                                    if (!error) {
-                                        if (ethoResult) {
-                                            waitForReceipt(ethoResult, function (receipt) {
-                                                resolve({
-                                                    ipfsHash: result.path,
-                                                    ethoTxHash: ethoResult,
-                                                    uploadCost: contractCost
-                                                });
+                                    const sendReceipt = (txHash) => {
+                                        waitForReceipt(client, txHash, function (receipt) {
+                                            resolve({
+                                                ipfsHash: result.path,
+                                                ethoTxHash: txHash,
+                                                uploadCost: uploadCost,
+                                                initiationBlock: receipt.blockNumber,
+                                                expirationBlock: (receipt.blockNumber + options.ethofsOptions.hostingContractDuration)
                                             });
-                                        } else {
-                                            reject(new Error('There was a problem adding new contract'));
-                                        }
+                                        });
+                                    };
+
+                                    if (client.metamask) {
+                                        delete tx.gas;
+
+                                        client.providerMM.request({ method: 'eth_sendTransaction', params: [tx] })
+                                            .then(sendReceipt)
+                                            .catch(reject);
                                     } else {
-                                        reject(error);
+                                        signAndSendTx(client, tx, privateKey)
+                                            .then(sendReceipt)
+                                            .catch(reject);
                                     }
-                                });
-                            });
-                        } else {
-                            reject(new Error('ethoFS User Not Found'));
-                        }
-                    } else {
-                        reject(new Error('Ether-1 RPC Access Error: ${error}'));
-                    }
-                });
-            });
-        }).catch((error) => {
-            reject(error);
-        });
+                                })
+                                .catch(reject);
+                        })
+                        .catch(reject);
+                } else reject(new Error('ethoFS User Not Found'));
+            })
+            .catch(reject);
     });
-}
+};

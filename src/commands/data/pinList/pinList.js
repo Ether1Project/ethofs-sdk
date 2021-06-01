@@ -1,9 +1,27 @@
+<<<<<<< HEAD
 const { validateEthofsDataFilter } = require('../../../util/validators');
+=======
+import { validateEthofsKey, validateEthofsDataFilter, validateEthofsConnections } from '../../../util/validators';
+import { baseUrl, controllerContractAddress, controllerABI } from '../../../constants';
+import Web3 from 'web3';
+
+export default function pinList(ethofsKey, options) {
+
+    var endpoint = `${baseUrl}`;
+
+    validateEthofsKey(ethofsKey);
+>>>>>>> 853ad7d49bb37d6419284eafe08e5a27342995bf
 
 module.exports = function pinList(client, options) {
     if (options) {
         if (options.ethofsDataFilter) {
             validateEthofsDataFilter(options.ethofsDataFilter);
+        }
+        if (options.connections) {
+            validateEthofsConnections(options.connections);
+            if (options.connections.rpc) {
+                endpoint = options.connections.rpc;
+            }
         }
     }
 

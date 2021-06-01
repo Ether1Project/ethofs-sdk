@@ -19,10 +19,9 @@ const pinFileToIPFS = require('./commands/pinning/pinFileToIPFS');
 const pinFolderToIPFS = require('./commands/pinning/pinFolderToIPFS');
 const unpin = require('./commands/pinning/unpin');
 const extendPin = require('./commands/pinning/extendPin');
-const pinJobs = require('./commands/pinning/pinJobs/pinJobs');
 
 let privateKey = null;
-let ethoFSKey = null;
+let appendOptions = {};
 
 const client = {
     // Work without Init
@@ -31,7 +30,7 @@ const client = {
     networkStats: networkStats,
 
     // Init SDK
-    init: (ethoKey) => new Promise((resolve, reject) => {
+    init: (ethoKey, connections) => new Promise((resolve, reject) => {
         if (!ethoKey) {
             if (window.ethereum) {
                 client.web3 = new Web3(window.ethereum);
@@ -63,9 +62,7 @@ const client = {
             validateEthofsKey(ethoKey); // Add the minimum and maximum number of digits in client function
 
             const lowerCaseKey = ethoKey.toLowerCase();
-
             privateKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey : `0x${lowerCaseKey}`;
-            ethoFSKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey.substr(2) : lowerCaseKey;
 
             const account = client.web3.eth.accounts.privateKeyToAccount(privateKey);
 
@@ -74,6 +71,7 @@ const client = {
 
             client.ethoFSContract = new client.web3.eth.Contract(controllerABI, controllerContractAddress);
 
+            if (connections) appendOptions = connections;
             resolve(true);
         }
     }),
@@ -88,11 +86,10 @@ const client = {
 
     // Work Only After Init and AddUser
     pinList: (filters) => pinList(client, filters),
-    pinFileToIPFS: (readableStream, options) => pinFileToIPFS(client, privateKey, readableStream, options),
-    pinFolderToIPFS: (readableStream, options) => pinFolderToIPFS(client, privateKey, readableStream, options),
+    pinFileToIPFS: (readableStream, options) => pinFileToIPFS(client, privateKey, readableStream, Object.assign(options, appendOptions)),
+    pinFolderToIPFS: (readableStream, options) => pinFolderToIPFS(client, privateKey, readableStream, Object.assign(options, appendOptions)),
     unpin: (uploadContractAddress) => unpin(client, privateKey, uploadContractAddress),
-    extendPin: (uploadContractAddress, options) => extendPin(client, privateKey, uploadContractAddress, options),
-    pinJobs: (filters) => pinJobs(client, ethoFSKey, filters)
+    extendPin: (uploadContractAddress, options) => extendPin(client, privateKey, uploadContractAddress, Object.assign(options, appendOptions))
 };
 
 module.exports = client;

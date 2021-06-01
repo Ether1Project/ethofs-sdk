@@ -75,3 +75,17 @@ module.exports.validateEthofsOptions = (options) => {
         }
     }
 };
+
+module.exports.validateEthofsConnections = (data) => {
+    if (data.rpc) {
+        if (!(typeof data.rpc === 'string' || data.rpc instanceof String)) {
+            throw new Error('invalid rpc connection');
+        }
+    }
+
+    if (data.gateway) {
+        if (!(typeof data.gateway === 'string')) {
+            throw new Error('invalid gateway connection');
+        }
+    }
+};

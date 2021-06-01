@@ -1,14 +1,14 @@
 <div class="bg-gray-dark">
-<img src="https://ethofs.com/index/images/logo.png" width="200" />
+<img src="https://github.com/Ether1Project/Ether-1-Branding/raw/master/PNG%20Logos/ethoProtocolBlack.png" width="200" />
 </div>
 
 # ethoFS SDK
 
-Official NodeJS SDK for [ethoFS](https://ethofs.com)
+Official NodeJS SDK for [ethoFS](https://ethoprotocol.com)
 
 ## Overview
 
-The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [ethoFS Network](https://docs.ether1.org/ethofs/ethofs-introduction).
+The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [Etho Protocol Network](https://docs.ethoprotocol.com/ethofs/ethofs-introduction).
 
 ## Installation
 ```
@@ -16,7 +16,7 @@ npm install --save @ethofs/sdk
 ```
 
 ## Setup
-To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key. Register a new upload address: [ethoFS Uploads](https://ethofs.com/uploads.html).
+To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key (Etho Protocol Key). Register a new upload address using the addUser function or by registering at: [Etho Protocol Uploads](https://uploads.ethoprotocol.com).
 
 ## Initialization Without Authentication
 ```javascript
@@ -27,6 +27,20 @@ const ethofs = ethofsSDK();
 ```javascript
 const ethofsSDK = require('@ethofs/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey');
+```
+## Initialization With Custom RPC/Gateway Locations
+##### Params
+* `connections` : A JSON object that contains the following keyvalues:
+  * `rpc` (optional) : The Etho Protocol RPC Location
+  * `gateway` (optional) : The IPFS API/Gateway Location
+##### Example Code
+```javascript
+const connections = {
+    rpc: 'https://rpc.ethoprotocol.com',
+    gateway: 'https://gateway.ethoprotocol.com'
+};
+const ethofsSDK = require('@ethofs/sdk');
+const ethofs = ethofsSDK('yourETHOPrivateKey', connections);
 ```
 
 Quickly test that you can connect to the API with the following call:
@@ -46,12 +60,14 @@ Once you've set up your instance, using the ethoFS SDK is easy. Simply call your
 * Data
   * [networkStats](#networkStats-anchor)
   * [nodeLocations](#nodeLocations-anchor)
+  * [calculateCost](#calculateCost-anchor)
 
 ## Authentication Required (ethoFS key required on initialization)
 * User
   * [addUser](#addUser-anchor)
 * Pinning
   * [pinFileToIPFS](#pinFileToIPFS-anchor)
+  * [pinFolderToIPFS](#pinFolderToIPFS-anchor)
   * [pinFromFS](#pinFromFS-anchor)
   * [extendPin](#extendPin-anchor)
   * [unpin](#unpin-anchor)
@@ -120,6 +136,41 @@ ethofs.nodeLocations().then((result) => {
     console.log(err);
 });
 ```
+<a name="calculateCost-anchor"></a>
+### `calculateCost`
+Estimate cost of a data upload by sending a request with upload duration and estimated size.
+
+##### `ethofs.calculateCost(options)`
+##### Params
+* `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the file to be added 
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
+#### Response
+```
+{
+    uploadSize: This is the calculated size of the upload,
+    uploadDuration: This is the upload contract duration provided by the user,
+    uploadCost: This is the calculated total cost in ETHO (wei) for the upload
+}
+```
+##### Example Code
+```javascript
+const fs = require('fs');
+const readableStreamForFile = fs.createReadStream('./yourfile.png');
+const options = {
+    ethofsOptions: {
+        hostingContractDuration: 100000,
+        hostingContractSize: 20000000
+    }
+};
+ethofs.calculateCost(options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
 <a name="addUser-anchor"></a>
 ### `addUser`
 Add a new user/address to ethoFS network.
@@ -161,7 +212,9 @@ Send a file to ethoFS for direct pinning to IPFS.
 {
     ipfsHash: This is the IPFS multi-hash provided back for your content,
     ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
-    uploadCost: This is the total cost in ETHO for the upload
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
 }
 ```
 ##### Example Code
@@ -178,10 +231,54 @@ const options = {
         }
     },
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.pinFileToIPFS(ethoFsKey, readableStreamForFile, options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+});
+```
+<a name="pinFolderToIPFS-anchor"></a>
+### `pinFolderToIPFS`
+Send a folder to ethoFS for direct pinning to IPFS.
+
+##### `ethofs.pinFolderToIPFS(readableStream, options)`
+##### Params
+* `readableStream` - A [readableStream](https://nodejs.org/api/stream.html) of the folder to be added 
+* `options` : A JSON object that contains the following keyvalues:
+  * `ethofsData` : A JSON object with (#ethofsData-anchor) for the data being pinned
+  * `ethofsOptions` : A JSON object with additional [options](#ethofsData-anchor) for the data being pinned
+#### Response
+```
+{
+    ipfsHash: This is the IPFS multi-hash provided back for your content,
+    ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
+}
+```
+##### Example Code
+```javascript
+const fs = require('fs');
+const readableStreamForFolder = fs.createReadStream('./yourDirectory');
+const options = {
+    ethofsData: {
+        name: 'MyCustomUploadName',
+        keyvalues: {
+            customKey: 'customValue',
+            customKey2: 'customValue2'
+        }
+    },
+    ethofsOptions: {
+        hostingContractDuration: 100000
+    }
+};
+ethofs.pinFolderToIPFS(readableStreamForFolder, options).then((result) => {
     //handle results here
     console.log(result);
 }).catch((err) => {
@@ -204,7 +301,9 @@ Send a file/directory from local filesystem to ethoFS for direct pinning to IPFS
 {
     ipfsHash: This is the IPFS multi-hash provided back for your content,
     ethoTXHash: This is transaction hash of the confirmed upload contract on the Ether-1 Network,
-    uploadCost: This is the total cost in ETHO for the upload
+    uploadCost: This is the total cost in ETHO for the upload,
+    initiationBlock: This is the block number the upload contract was initialized/created on,
+    expirationBlock: This is the block number that the upload contract will expire on
 }
 ```
 ##### Example Code
@@ -219,7 +318,7 @@ const options = {
         }
     },
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.pinFromFS(sourceDirectory, options).then((result) => {
@@ -231,7 +330,7 @@ ethofs.pinFromFS(sourceDirectory, options).then((result) => {
 });
 ```
 <a name="extendPin-anchor"></a>
-### `unpin`
+### `extendPin`
 Have ethoFS unpin content that you've pinned/uploaded through the platform.
 
 ##### `ethofs.extendPin(uploadContractAddress, options)`
@@ -249,7 +348,7 @@ Have ethoFS unpin content that you've pinned/uploaded through the platform.
 ```javascript
 const options = {
     ethofsOptions: {
-        uploadContractDuration: 100000
+        hostingContractDuration: 100000
     }
 };
 ethofs.extendPin(hostingContractAddress, options).then((result) => {
@@ -286,7 +385,7 @@ ethofs.unpin(hashToUnpin).then((result) => {
 
 <a name="testAuthentication-anchor"></a>
 ### `testAuthentication`
-Tests that you can authenticate with ethoFS correctly
+Tests that you can authenticate with ethoFS correctly and the authentication key is registered
 
 ##### `ethofs.testAuthentication()`
 ##### Params
@@ -323,7 +422,7 @@ List pin contracts stored in ethoFS.
     address: This is the Ether-1 contract address,
     data: This is any saved data along with upload (ie name/keyvalues),
     ipfsHash: This is the IPFS multi-hash provided back for your content,
-    uploadBlock: This is the original Ether-1 block the upload was iniated/recorded in,
+    initiationBlock: This is the original Ether-1 block the upload was iniated/recorded in,
     expirationBlock: This is the Ether-1 expiration block of the upload contract
 }
 ```
@@ -358,7 +457,7 @@ The options object can consist of the following values:
 ##### Example ethofsOptions object
 ```
 {
-    uploadContractDuration: 100000
+    hostingContractDuration: 100000
 }
 ```
 <a name="ethofsData-anchor"></a>

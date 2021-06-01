@@ -2,7 +2,7 @@
 const Web3 = require('web3');
 const detectEthereumProvider = require('@metamask/detect-provider');
 const { baseUrl, controllerContractAddress, controllerABI } = require('./constants');
-const { validateEthofsKey } = require('./util/validators');
+const { validateEthofsKey, validateEthofsConnections } = require('./util/validators');
 
 const calculateCost = require('./commands/pinning/calculateCost');
 const nodeLocations = require('./commands/data/networkStats/nodeLocations');
@@ -19,10 +19,8 @@ const pinFileToIPFS = require('./commands/pinning/pinFileToIPFS');
 const pinFolderToIPFS = require('./commands/pinning/pinFolderToIPFS');
 const unpin = require('./commands/pinning/unpin');
 const extendPin = require('./commands/pinning/extendPin');
-const pinJobs = require('./commands/pinning/pinJobs/pinJobs');
 
 let privateKey = null;
-let ethoFSKey = null;
 
 const client = {
     // Work without Init
@@ -31,7 +29,7 @@ const client = {
     networkStats: networkStats,
 
     // Init SDK
-    init: (ethoKey) => new Promise((resolve, reject) => {
+    init: (ethoKey, connections) => new Promise((resolve, reject) => {
         if (!ethoKey) {
             if (window.ethereum) {
                 client.web3 = new Web3(window.ethereum);
@@ -59,13 +57,18 @@ const client = {
                     .catch(reject);
             } else reject(new Error('Please install an Ethereum-compatible browser or MetaMask extension or provide ethoFSKey.'));
         } else {
-            client.web3 = new Web3(baseUrl);
+            let endpoint = baseUrl;
+
+            if (connections) {
+                validateEthofsConnections(connections);
+                if (connections.rpc) endpoint = connections.rpc;
+            }
+
+            client.web3 = new Web3(endpoint);
             validateEthofsKey(ethoKey); // Add the minimum and maximum number of digits in client function
 
             const lowerCaseKey = ethoKey.toLowerCase();
-
             privateKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey : `0x${lowerCaseKey}`;
-            ethoFSKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey.substr(2) : lowerCaseKey;
 
             const account = client.web3.eth.accounts.privateKeyToAccount(privateKey);
 
@@ -91,8 +94,7 @@ const client = {
     pinFileToIPFS: (readableStream, options) => pinFileToIPFS(client, privateKey, readableStream, options),
     pinFolderToIPFS: (readableStream, options) => pinFolderToIPFS(client, privateKey, readableStream, options),
     unpin: (uploadContractAddress) => unpin(client, privateKey, uploadContractAddress),
-    extendPin: (uploadContractAddress, options) => extendPin(client, privateKey, uploadContractAddress, options),
-    pinJobs: (filters) => pinJobs(client, ethoFSKey, filters)
+    extendPin: (uploadContractAddress, options) => extendPin(client, privateKey, uploadContractAddress, options)
 };
 
 module.exports = client;

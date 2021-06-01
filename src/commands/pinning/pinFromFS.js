@@ -41,12 +41,6 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
         }
     }
 
-    async function uploadToIPFS(files) {
-
-        return await ipfs.add(files);
-
-    };
-
     function waitForReceipt(hash, cb) {
         web3.eth.getTransactionReceipt(hash, function (err, receipt) {
             web3.eth.getBlock('latest', function (e, res) {
@@ -180,17 +174,15 @@ export default function pinFromFS(ethofsKey, sourcePath, options) {
                 //we need to create a single read stream instead of reading the directory recursively
                 let readStream = fs.createReadStream(sourcePath);
 
-                uploadToIPFS(readStream).then((result) => {
-                    pinToEthofs(result);
-                });
+                ipfs.add(readStream)
+                    .then(pinToEthofs);
 
             } else {
 
                 let files = getAllFiles(sourcePath);
 
-                uploadToIPFS(files).then((result) => {
-                    pinToEthofs(result);
-                });
+                ipfs.add(files)
+                    .then(pinToEthofs);
             }
         });
     });

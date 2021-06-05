@@ -36,11 +36,13 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
+    "chalk": "^4.1.1",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "electron": "^13.0.1",
     "eslint": "^7.27.0",
     "eslint-loader": "^4.0.2",
     "html-webpack-plugin": "^4.5.2",
+    "inquirer": "^8.1.0",
     "jest": "^25.5.4",
     "webpack": "^4.44.2",
     "webpack-cli": "^4.7.0",

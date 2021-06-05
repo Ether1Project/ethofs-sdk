@@ -29,7 +29,7 @@ const prompt = function () {
                     {
                         type: 'input',
                         name: 'params',
-                        message: '[Optional] Please pass parameters to this function. Eg to call init(privateKey), pass "--000000000000000000000000000000000000000000000000000000000000000" as answer',
+                        message: '[Optional] Please pass parameters to this function. Eg to call init(privateKey), pass "--000000000000000000000000000000000000000000000000000000000000000" as answer'
                     }
                 ])
                 .then(async ({ params }) => {
@@ -66,3 +66,33 @@ const prompt = function () {
 };
 
 prompt();
+
+// const fs = require('fs');
+// const path = require('path');
+// const ethoFS = require('../../lib/ethofs-sdk');
+
+// const SDK = ethoFS(''); // Add PrivateKey
+
+// console.log(SDK);
+
+// const func = async () => {
+//     const readableStreamForFile = await fs.createReadStream(path.resolve(__dirname, '../copy.png'));
+//     const options = {
+//         ethofsData: {
+//             name: 'MyCustomUploadName',
+//             keyvalues: {
+//                 customKey: 'customValue',
+//                 customKey2: 'customValue2'
+//             }
+//         },
+//         ethofsOptions: {
+//             hostingContractDuration: 100000
+//         }
+//     };
+
+//     console.log('Getting Pin List');
+//     console.log(await JSON.stringify(SDK.pinList()));
+//     console.log(await SDK.pinFileToIPFS(readableStreamForFile, options));
+// };
+
+// func();

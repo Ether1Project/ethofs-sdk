@@ -1,8 +1,6 @@
 /* eslint-disable newline-after-var */
-const Web3 = require('web3');
-const detectEthereumProvider = require('@metamask/detect-provider');
-const { baseUrl, controllerContractAddress, controllerABI } = require('./constants');
-const { validateEthofsKey, validateEthofsConnections } = require('./util/validators');
+const initMetaMask = require('./commands/init/metmask');
+const initPrivateKey = require('./commands/init/privateKey');
 
 const calculateCost = require('./commands/pinning/calculateCost');
 const nodeLocations = require('./commands/data/networkStats/nodeLocations');
@@ -23,28 +21,6 @@ const extendPin = require('./commands/pinning/extendPin');
 
 let privateKey = null;
 
-const initPrivateKey = (mainObject, ethoKey, connections) => {
-    let endpoint = baseUrl;
-
-    if (connections) {
-        validateEthofsConnections(connections);
-        if (connections.rpc) endpoint = connections.rpc;
-    }
-
-    mainObject.web3 = new Web3(endpoint);
-    validateEthofsKey(ethoKey); // Add the minimum and maximum number of digits in client function
-
-    const lowerCaseKey = ethoKey.toLowerCase();
-    privateKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey : `0x${lowerCaseKey}`;
-
-    const account = mainObject.web3.eth.accounts.privateKeyToAccount(privateKey);
-
-    mainObject.web3.eth.accounts.wallet.add(account);
-    mainObject.web3.eth.defaultAccount = account.address;
-
-    mainObject.ethoFSContract = new mainObject.web3.eth.Contract(controllerABI, controllerContractAddress);
-};
-
 const client = {
     // Work without Init
     calculateCost: (options) => calculateCost(options),
@@ -53,38 +29,25 @@ const client = {
 
     // Init SDK
     init: (ethoKey, connections) => new Promise((resolve, reject) => {
+        // Store Private Key for future reference
+        if (ethoKey) {
+            const lowerCaseKey = ethoKey.toLowerCase();
+            privateKey = lowerCaseKey.indexOf('0x') > -1 ? lowerCaseKey : `0x${lowerCaseKey}`;
+            ethoKey = lowerCaseKey.indexOf('0x') === 0 ? String(ethoKey).substr(2) : lowerCaseKey;
+        }
+
         try {
-            if (window) console.log('Web Evironment detected');
-
-            if (!ethoKey) {
-                if (window.ethereum) {
-                    client.web3 = new Web3(window.ethereum);
-
-                    detectEthereumProvider()
-                        .then((providerMM) => {
-                            client.providerMM = providerMM;
-
-                            window.ethereum.enable()
-                                .then(() => {
-                                    client.providerMM.request({ method: 'eth_requestAccounts' })
-                                        .then((response) => {
-                                            client.web3.eth.defaultAccount = response[0];
-                                            client.metamask = true;
-
-                                            client.ethoFSContract = new client.web3.eth.Contract(controllerABI, controllerContractAddress);
-                                            resolve(true);
-                                        }).catch(reject);
-                                })
-                                .catch((err) => {
-                                    if (err.code === -32002) reject(new Error('Please provide Metamask access to site by logging in to your Metamask'));
-                                    reject(new Error(err));
-                                });
-                        })
-                        .catch(reject);
-                } else reject(new Error('Please install an Ethereum-compatible browser or MetaMask extension or provide ethoFSKey.'));
-            } else {
-                initPrivateKey(client, ethoKey, connections);
-                resolve(true);
+            if (window) {
+                if (!ethoKey) {
+                    if (window.ethereum) {
+                        initMetaMask(client, connections)
+                            .then(resolve)
+                            .catch(reject);
+                    } else reject(new Error('Please install an Ethereum-compatible browser or MetaMask extension or provide ethoFSKey.'));
+                } else {
+                    initPrivateKey(client, ethoKey, connections);
+                    resolve(true);
+                }
             }
         } catch {
             initPrivateKey(client, ethoKey, connections);
@@ -105,6 +68,7 @@ const client = {
     pinList: (filters) => pinList(client, filters),
     pinFileToIPFS: (readableStream, options) => pinFileToIPFS(client, privateKey, readableStream, options),
     pinFolderToIPFS: (readableStream, options) => pinFolderToIPFS(client, privateKey, readableStream, options),
+    pinFromFS: (sourcePath, options) => require('./commands/pinning/pinFromFS')(client, sourcePath, options),
     unpin: (uploadContractAddress) => unpin(client, privateKey, uploadContractAddress),
     extendPin: (uploadContractAddress, options) => extendPin(client, privateKey, uploadContractAddress, options)
 };

@@ -4,15 +4,13 @@
   "description": "Official SDK for the ethoFS Platform and Etho Protocol Network",
   "main": "lib/ethofs-sdk.js",
   "scripts": {
-    "build": "webpack --env mode=development && webpack --env mode=production",
-    "coverage": "jest --coverage",
-    "dev-web": "webpack serve --env mode=development dev=web",
+    "build-web": "webpack --env mode=production",
+    "dev-web": "webpack serve --env mode=development",
     "dev-node": "node ./src-dev/node/index.js",
     "html": "open coverage/index.html",
     "lint": "eslint src --quiet ",
     "lint:fix": "eslint src --fix",
-    "test": "jest",
-    "repl": "node -i -e \"$(< ./lib/ethofs-sdk.js)\""
+    "test": "jest"
   },
   "repository": {
     "type": "git",

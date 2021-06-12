@@ -35,7 +35,7 @@ module.exports = function sendEther(client, privateKey, options) {
                         .catch(reject);
                 };
 
-                if (client.metamask) {
+                if (client.providerMM) {
                     delete tx.gas;
 
                     client.providerMM.request({ method: 'eth_sendTransaction', params: [tx]})

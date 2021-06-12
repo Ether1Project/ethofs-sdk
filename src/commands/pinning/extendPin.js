@@ -50,7 +50,7 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
                                             .catch(reject);
                                     };
 
-                                    if (client.metamask) {
+                                    if (client.providerMM) {
                                         delete tx.gas;
 
                                         client.providerMM.request({ method: 'eth_sendTransaction', params: [tx] })

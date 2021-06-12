@@ -1,6 +1,4 @@
-const ipfsClient = require('ipfs-http-client');
-
-const { apiBaseUrl, controllerContractAddress } = require('./../../constants');
+const { controllerContractAddress } = require('./../../constants');
 const { validateEthofsData } = require('../../util/validators');
 const isInitialized = require('../../util/isInitialized');
 const waitForReceipt = require('../../util/waitForReciept');
@@ -10,8 +8,6 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
     isInitialized(client);
 
     let data;
-    const apiEndpoint = apiBaseUrl;
-    const ipfs = ipfsClient({host: apiEndpoint, port: '5001', protocol: 'https'});
 
     if (options) {
         if (options.ethofsData) {
@@ -24,7 +20,7 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
         client.accountExists()
             .then((exists) => {
                 if (exists) {
-                    ipfs.add(readStream)
+                    client.ipfs.add(readStream)
                         .then((result) => {
                             const contentHashString = 'ethoFSPinningChannel_alpha11:' + result.path.toString();
                             const contentPathString = 'ethoFSPinningChannel_alpha11:';
@@ -58,7 +54,7 @@ module.exports = function pinFileToIPFS(client, privateKey, readStream, options)
                                             .catch(reject);
                                     };
 
-                                    if (client.metamask) {
+                                    if (client.providerMM) {
                                         delete tx.gas;
 
                                         client.providerMM.request({ method: 'eth_sendTransaction', params: [tx] })

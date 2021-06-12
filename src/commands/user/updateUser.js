@@ -27,7 +27,7 @@ module.exports = function addUser(client, privateKey, userName) {
                     .catch(reject);
             };
 
-            if (client.metamask) {
+            if (client.providerMM) {
                 delete tx.gas;
 
                 client.providerMM.request({ method: 'eth_sendTransaction', params: [tx]})

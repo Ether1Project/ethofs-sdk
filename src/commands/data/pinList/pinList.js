@@ -39,6 +39,7 @@ module.exports = function pinList(client, options) {
                 .catch(reject)
         ])
             .then(() => {
+                console.log(contractData);
                 resolve(contractData);
             })
             .catch(reject);
@@ -50,60 +51,74 @@ module.exports = function pinList(client, options) {
                 if (exists) {
                     client.ethoFSContract.methods.GetUserAccountTotalContractCount(client.web3.eth.defaultAccount).call()
                         .then((contractCount) => {
-                            contractCount = Number(contractCount);
-                            const uploadContractArray = [];
+                            const conLength = Number(contractCount);
 
-                            if (contractCount === 0) resolve(uploadContractArray);
-                            else if (contractCount > 0) {
-                                let expiredContractCount = 0;
+                            console.log(conLength);
+                            console.log(client.web3.eth.defaultAccount);
 
-                                let filteredContractCount = 0;
+                            if (conLength < 1) resolve([]);
+                            else {
+                                const promiseArray = [];
 
-                                Promise.all(new Array(contractCount)
-                                    .map((i, contractIndex) => {
-                                        return client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, contractIndex).call()
-                                            .then((hostingContractAddress) => {
-                                                getEthofsUploadContract(hostingContractAddress)
-                                                    .then((result) => {
-                                                        if (result.expirationBlock === '0') expiredContractCount++;
-                                                        else if (options && (options.ethofsDataFilter)) {
-                                                            let filteredContract = false;
+                                for (let index = 0; index < conLength; index++) {
+                                    promiseArray.push(
+                                        client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, index).call().catch(reject)
+                                    );
+                                }
 
-                                                            try {
-                                                                const data = JSON.parse(result.data);
+                                console.log(promiseArray);
 
-                                                                for (const property in options.ethofsDataFilter) {
-                                                                    if (filteredContract) break;
+                                Promise.all(promiseArray)
+                                    .then(() => {
+                                        promiseArray.forEach((hostingContractAddress, index) => {
+                                            promiseArray[index] = getEthofsUploadContract(hostingContractAddress);
+                                        });
+                                        Promise.all(promiseArray)
+                                            .then(() => {
+                                                let expiredContractCount = 0;
 
-                                                                    if (String(options.ethofsDataFilter[property]) === String(data[property])) {
-                                                                        uploadContractArray.push(result);
-                                                                        filteredContract = true;
-                                                                        break;
-                                                                    } else {
-                                                                        for (const key in options.property) {
-                                                                            if (String(options.ethofsDataFilter[property][key]) === String(data[property][key])) {
-                                                                                uploadContractArray.push(result);
-                                                                                filteredContract = true;
-                                                                                break;
-                                                                            }
+                                                let filteredContractCount = 0;
+
+                                                const resultArray = [];
+
+                                                promiseArray.forEach((result) => {
+                                                    console.log(result);
+                                                    if (result.expirationBlock === '0') expiredContractCount++;
+                                                    else if (options && (options.ethofsDataFilter)) {
+                                                        let filteredContract = false;
+
+                                                        try {
+                                                            const data = JSON.parse(result.data);
+
+                                                            for (const property in options.ethofsDataFilter) {
+                                                                if (filteredContract) break;
+
+                                                                if (String(options.ethofsDataFilter[property]) === String(data[property])) {
+                                                                    resultArray.push(result);
+                                                                    filteredContract = true;
+                                                                    break;
+                                                                } else {
+                                                                    for (const key in options.property) {
+                                                                        if (String(options.ethofsDataFilter[property][key]) === String(data[property][key])) {
+                                                                            resultArray.push(result);
+                                                                            filteredContract = true;
+                                                                            break;
                                                                         }
                                                                     }
                                                                 }
-                                                            } catch {}
+                                                            }
+                                                        } catch {}
 
-                                                            if (!filteredContract) filteredContractCount++;
-                                                        } else uploadContractArray.push(result);
-                                                    })
-                                                    .catch(reject);
+                                                        if (!filteredContract) filteredContractCount++;
+                                                    } else resultArray.push(result);
+                                                });
+
+                                                if (resultArray.length >= (contractCount - (expiredContractCount + filteredContractCount))) resolve(resultArray);
+                                                else reject('Unable to retrieve any contracts against provided filters.');
                                             })
                                             .catch(reject);
-                                    }))
-                                        .then(() => {
-                                            if (uploadContractArray.length >= (contractCount - (expiredContractCount + filteredContractCount))) resolve(uploadContractArray);
-                                            else reject('Unable to retrieve contracts against provided filters. Try filtering to smaller amounts.');
-                                        })
-                                        .catch(reject);
-
+                                    })
+                                    .catch(reject);
                             };
                         })
                         .catch(reject);

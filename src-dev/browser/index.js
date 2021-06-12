@@ -39,7 +39,15 @@ document.addEventListener('click', (evt) => {
 
         // Pin List
         case document.querySelector('#pinList'):
-            ethoFS.pinList()
+            ethoFS.pinList({
+                ethofsDataFilter: {
+                    name: 'Test Contract',
+                    keyvalues: {
+                        customKey: 'customValue',
+                        customKey2: 'customValue2'
+                    }
+                }
+            })
                 .then(console.log)
                 .catch(console.log);
             break;

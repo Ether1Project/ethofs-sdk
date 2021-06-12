@@ -10,7 +10,7 @@ module.exports = function accountExists(client) {
                     if (!error) resolve(ethofsResult);
                     else reject(new Error(`Ether-1 RPC Access Error: ${error}`));
                 })
-                .catch(console.log);
+                .catch(reject);
             })
             .catch(reject);
     });

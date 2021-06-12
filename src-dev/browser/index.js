@@ -36,6 +36,19 @@ document.addEventListener('click', (evt) => {
         case document.querySelector('#getWalletAddress'):
             console.log(ethoFS.getWalletAddress());
             break;
+        case document.querySelector('#sendEther'):
+            const to = document.querySelector('#address').value.trim();
+            const value = document.querySelector('#amount').value.trim();
+
+            if (to !== '' && value > 0) {
+                ethoFS.sendEther({
+                    to: to,
+                    value: value
+                })
+                    .then(console.log)
+                    .catch(console.log);
+            } else console.error('Please enter a valid address and make sure amount is greater than 0');
+            break;
 
         // Pin List
         case document.querySelector('#pinList'):
@@ -88,11 +101,6 @@ document.addEventListener('click', (evt) => {
                     .catch(console.log);
             } else console.error('Please enter a valid user name');
             break;
-        case document.querySelector('#removeUser'):
-            ethoFS.removeUser()
-                .then(console.log)
-                .catch(console.log);
-            break;
 
         // Pinning
         case document.querySelector('#calculateCost'):
@@ -122,7 +130,8 @@ document.addEventListener('click', (evt) => {
                             }
                         },
                         ethofsOptions: {
-                            hostingContractDuration: 100000
+                            hostingContractDuration: 100000,
+                            hostingContractSize: 20000000
                         }
                     }
                 )

@@ -6,7 +6,6 @@ const signAndSendTx = require('../../util/signAndSendTx');
 
 module.exports = function pinFileToIPFS(client, privateKey, readStream, options) {
     isInitialized(client);
-
     let data;
 
     if (options) {

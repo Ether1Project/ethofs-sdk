@@ -1,7 +1,7 @@
 const bs58 = require('bs58');
 
 const { controllerContractAddress } = require('./../../constants');
-const { validateEthofsData, validateEthofsOptions } = require('../../util/validators');
+const { validateEthofsData } = require('../../util/validators');
 const isInitialized = require('../../util/isInitialized');
 const waitForReceipt = require('../../util/waitForReciept');
 const signAndSendTx = require('../../util/signAndSendTx');
@@ -15,9 +15,6 @@ module.exports = function pinFolderToIPFS(client, privateKey, readStream, option
         if (options.ethofsData) {
             validateEthofsData(options.ethofsData);
             data = JSON.stringify(options.ethofsData);
-        }
-        if (options.ethofsOptions) {
-            validateEthofsOptions(options.ethofsOptions);
         }
     }
 

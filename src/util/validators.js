@@ -63,6 +63,10 @@ module.exports.validateEthofsOptions = (options) => {
         throw new Error('options must be an object');
     }
 
+    if (!options.hostingContractSize || !options.hostingContractDuration) {
+        throw new Error('Properly formatted ethofs options containing hostingContractSize and hostingContractDuration required');
+    }
+
     if (options.hostingContractDuration) {
         if (options.hostingContractDuration < 6646 || typeof options.hostingContractDuration !== 'number') {
             throw new Error('incorrect hosting contract duration');

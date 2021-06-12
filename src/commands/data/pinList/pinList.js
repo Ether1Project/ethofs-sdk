@@ -39,7 +39,6 @@ module.exports = function pinList(client, options) {
                 .catch(reject)
         ])
             .then(() => {
-                console.log(contractData);
                 resolve(contractData);
             })
             .catch(reject);
@@ -53,28 +52,30 @@ module.exports = function pinList(client, options) {
                         .then((contractCount) => {
                             const conLength = Number(contractCount);
 
-                            console.log(conLength);
-                            console.log(client.web3.eth.defaultAccount);
-
                             if (conLength < 1) resolve([]);
                             else {
-                                const promiseArray = [];
+                                const promiseArray = new Array(conLength);
 
                                 for (let index = 0; index < conLength; index++) {
-                                    promiseArray.push(
-                                        client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, index).call().catch(reject)
-                                    );
+                                    promiseArray[index] = client.ethoFSContract.methods.GetHostingContractAddress(client.web3.eth.defaultAccount, index).call()
+                                        .then((result) => {
+                                            promiseArray[index] = result;
+                                        })
+                                        .catch(reject);
                                 }
-
-                                console.log(promiseArray);
 
                                 Promise.all(promiseArray)
                                     .then(() => {
                                         promiseArray.forEach((hostingContractAddress, index) => {
-                                            promiseArray[index] = getEthofsUploadContract(hostingContractAddress);
+                                            promiseArray[index] = getEthofsUploadContract(hostingContractAddress)
+                                                .then((result) => {
+                                                    promiseArray[index] = result;
+                                                })
+                                                .catch(reject);
                                         });
                                         Promise.all(promiseArray)
                                             .then(() => {
+                                                resolve(promiseArray);
                                                 let expiredContractCount = 0;
 
                                                 let filteredContractCount = 0;
@@ -82,7 +83,6 @@ module.exports = function pinList(client, options) {
                                                 const resultArray = [];
 
                                                 promiseArray.forEach((result) => {
-                                                    console.log(result);
                                                     if (result.expirationBlock === '0') expiredContractCount++;
                                                     else if (options && (options.ethofsDataFilter)) {
                                                         let filteredContract = false;

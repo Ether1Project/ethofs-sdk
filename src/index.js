@@ -23,7 +23,7 @@ let privateKey = null;
 
 const client = {
     // Work without Init
-    calculateCost: (options) => calculateCost(options),
+    calculateCost: (options) => calculateCost(client, options),
     nodeLocations: nodeLocations,
     networkStats: networkStats,
 

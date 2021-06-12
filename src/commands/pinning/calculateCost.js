@@ -3,8 +3,13 @@ const Web3 = require('web3');
 const { baseUrl, configContractAddress, configContractABI } = require('./../../constants');
 const { validateEthofsOptions } = require('../../util/validators');
 
-module.exports = function calculateCost(options) {
-    const web3 = new Web3(baseUrl);
+module.exports = function calculateCost(client, options) {
+    if (options) {
+        if (options.ethofsOptions) {
+            validateEthofsOptions(options.ethofsOptions);
+        }
+    }
+    const web3 = client.web3 || new Web3(baseUrl);
 
     const calculateContractCost = (contractSize, contractDuration, hostingCost) => {
         const cost = ((((contractSize / 1048576) * hostingCost) * (contractDuration / 46522)));
@@ -19,16 +24,6 @@ module.exports = function calculateCost(options) {
             .then(resolve)
             .catch(reject);
     });
-
-    if (!options || !options.ethofsOptions || !options.ethofsOptions.hostingContractSize || !options.ethofsOptions.hostingContractDuration) {
-        throw new Error('Properly formatted ethofs options containing hostingContractSize and hostingContractDuration required');
-    }
-
-    if (options) {
-        if (options.ethofsOptions) {
-            validateEthofsOptions(options.ethofsOptions);
-        }
-    }
 
     return new Promise((resolve, reject) => {
         getEthofsUploadCost()

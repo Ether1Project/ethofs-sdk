@@ -1,5 +1,4 @@
 const { controllerContractAddress } = require('./../../constants');
-const { validateEthofsOptions } = require('../../util/validators');
 const isInitialized = require('../../util/isInitialized');
 const waitForReceipt = require('../../util/waitForReciept');
 const signAndSendTx = require('../../util/signAndSendTx');
@@ -8,12 +7,6 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
     isInitialized(client);
 
     if (!hostingContractAddress) throw new Error('hostingContractAddress value is required for removing an upload contract from ethoFS');
-
-    if (options) {
-        if (options.ethofsOptions) {
-            validateEthofsOptions(options.ethofsOptions);
-        }
-    }
 
     return new Promise((resolve, reject) => {
         client.accountExists()
@@ -24,7 +17,7 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
                             client.calculateCost({
                                 ethofsOptions: {
                                     hostingContractDuration: options.ethofsOptions.hostingContractDuration,
-                                    hostingContractSize: result
+                                    hostingContractSize: Number(result)
                                 }
                             })
                                 .then(({ extensionCost }) => {

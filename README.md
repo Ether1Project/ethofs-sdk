@@ -16,19 +16,65 @@ npm install --save @ethofs/sdk
 ```
 
 ## Setup
-To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key (Etho Protocol Key). Register a new upload address using the addUser function or by registering at: [Etho Protocol Uploads](https://uploads.ethoprotocol.com).
+To start, simply require the ethoFS SDK and set up an instance with your ethoFS Upload Address/Key (Etho Protocol Key)
 
-## Initialization Without Authentication
+OR 
+
+If you do not provide a privateKey, the SDK will try and use metamask by default out of the box.
+
+
+In both cases, you need to register a new upload address using the addUser function or by registering at: [Etho Protocol Uploads](https://uploads.ethoprotocol.com).
+
+## Using Without Authentication
+You can partially load commands from the library depending on your needs and/or you can also completely load the module.
+
+1. Completely Load the Module
+
 ```javascript
 const ethofsSDK = require('@ethofs/sdk');
-const ethofs = ethofsSDK();
+const options = {
+    ethofsOptions: {
+        hostingContractDuration: 100000,
+        hostingContractSize: 20000000
+    }
+};
+ethofsSDK.calculateCost(options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+}); 
 ```
-## Initialization With Authentication
+
+2. Partially Load the Module
+```javascript
+const { calculateCost } = require('@ethofs/sdk');
+const options = {
+    ethofsOptions: {
+        hostingContractDuration: 100000,
+        hostingContractSize: 20000000
+    }
+};
+calculateCost(options).then((result) => {
+    //handle results here
+    console.log(result);
+}).catch((err) => {
+    //handle error here
+    console.log(err);
+}); 
+```
+
+## Using With Authentication
 ```javascript
 const ethofsSDK = require('@ethofs/sdk');
-const ethofs = ethofsSDK('yourETHOPrivateKey');
+ethofsSDK.init() // Use Metamask
+ethofsSDK.init(null, connections) // Use Metamask and custom IPFS connection
+
+ethofsSDK.init(ethoKey) // Use privateKey
+ethofsSDK.init(ethoKey, connections) // Use privateKey and custom Network and IPFS connection
 ```
-## Initialization With Custom RPC/Gateway Locations
+## Custom RPC/Gateway Options
 ##### Params
 * `connections` : A JSON object that contains the following keyvalues:
   * `rpc` (optional) : The Etho Protocol RPC Location
@@ -36,11 +82,11 @@ const ethofs = ethofsSDK('yourETHOPrivateKey');
 ##### Example Code
 ```javascript
 const connections = {
-    rpc: 'https://rpc.ethoprotocol.com',
+    rpc: 'https://rpc.ethoprotocol.com', // For metamask, not relevant
     gateway: 'https://gateway.ethoprotocol.com'
 };
 const ethofsSDK = require('@ethofs/sdk');
-const ethofs = ethofsSDK('yourETHOPrivateKey', connections);
+ethofsSDK.init('yourETHOPrivateKey', connections)
 ```
 
 Quickly test that you can connect to the API with the following call:

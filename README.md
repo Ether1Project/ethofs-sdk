@@ -10,6 +10,33 @@ Official NodeJS SDK for [ethoFS](https://ethoprotocol.com)
 
 The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [Etho Protocol Network](https://docs.ethoprotocol.com/ethofs/ethofs-introduction).
 
+## Release Notes
+
+# Breaking Changes
+1. Initialization: The initialization method has changed as per the example below.
+
+```javascript
+const ethofsSDK = require('@ethofs/sdk');
+
+// Earlier
+const etho = ethofsSDK(privateKey);
+etho.calculateCost(options)
+    .then(console.log)
+    .catch(console.log);
+
+// Now
+ethofsSDK.init(ethoKey) // Use privateKey
+ethofsSDK.calculateCost(options)
+    .then(console.log)
+    .catch(console.log);
+```
+
+# Features and Enhancements
+1. Each function is now a promise.
+2. There is out of box support for Metamask.
+3. You can partially import specific functions from the module.
+4. The same SDK can be used for the web.
+
 ## Installation
 ```
 npm install --save @ethofs/sdk

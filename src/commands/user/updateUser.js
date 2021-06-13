@@ -19,9 +19,9 @@ module.exports = function addUser(client, privateKey, userName) {
 
             const sendReceipt = (txHash) => {
                 waitForReceipt(client, txHash)
-                    .then((result) => {
+                    .then((txResult) => {
                         resolve({
-                            ethoTxHash: result.transactionHash
+                            ethoTxHash: txResult.transactionHash
                         });
                     })
                     .catch(reject);

@@ -27,9 +27,9 @@ module.exports = function sendEther(client, privateKey, options) {
 
                 const sendReceipt = (txHash) => {
                     waitForReceipt(client, txHash)
-                        .then((result) => {
+                        .then((txResult) => {
                             resolve({
-                                ethoTxHash: result.transactionHash
+                                ethoTxHash: txResult.transactionHash
                             });
                         })
                         .catch(reject);

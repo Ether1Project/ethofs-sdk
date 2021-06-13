@@ -1,53 +1,56 @@
-const { createReadStream, readdirSync, readFileSync, statSync, lstatSync } = require('fs');
+const { createReadStream, readdirSync, readFileSync, statSync, lstat } = require('fs');
 const path = require('path');
 
-export default function pinFromFS(client, sourcePath, options) {
+module.exports = function pinFromFS(client, sourcePath, options) {
     return new Promise((resolve, reject) => {
-        lstatSync
-            .then((stats) => {
-                if (stats.isFile()) {
-                    //we need to create a single read stream instead of reading the directory recursively
-                    const readableStream = createReadStream(sourcePath);
+        lstat(sourcePath, (err, stats) => {
+            if (err) reject(err);
 
-                    client.pinFileToIPFS(readableStream, options)
-                        .then(resolve)
-                        .catch(reject);
-                } else {
-                    const getAllFiles = (dirPath, OriginalPath, ArrayOfFiles) => {
-                        const files = readdirSync(dirPath);
-                        const arrayOfFiles = ArrayOfFiles || [];
-                        const originalPath = OriginalPath || path.resolve(dirPath, '..');
-                        const folder = path.relative(originalPath, path.join(dirPath, '/'));
+            if (stats.isFile()) {
+                //we need to create a single read stream instead of reading the directory recursively
+                const readableStream = createReadStream(sourcePath);
 
-                        arrayOfFiles.push({
-                            path: folder.replace(/\\/g, '/'),
-                            mtime: statSync(folder).mtime
-                        });
+                client.pinFileToIPFS(readableStream, options)
+                    .then(resolve)
+                    .catch(reject);
+            } else {
+                const getAllFiles = (dir) => {
+                    let results = [];
 
-                        files.forEach(function (file) {
-                            if (statSync(dirPath + '/' + file).isDirectory()) {
-                                arrayOfFiles = getAllFiles(dirPath + '/' + file, originalPath, arrayOfFiles);
-                            } else {
-                                file = path.join(dirPath, '/', file);
+                    results.push(({
+                        path: dir.replace(/\\/g, '/'),
+                        mtime: statSync(dir).mtime
+                    }));
 
-                                arrayOfFiles.push({
-                                    path: path.relative(originalPath, file).replace(/\\/g, '/'),
-                                    content: readFileSync(file),
-                                    mtime: statSync(file).mtime
-                                });
-                            }
-                        });
+                    const list = readdirSync(dir);
 
-                        return arrayOfFiles;
-                    };
+                    list.forEach((file) => {
+                        const newPath = path.resolve(dir, file);
 
-                    const files = getAllFiles(sourcePath);
+                        const stat = statSync(newPath);
 
-                    client.pinFolderToIPFS(files, options)
-                        .then(resolve)
-                        .catch(reject);
-                }
-            })
-            .catch(reject);
+                        if (stat && stat.isDirectory()) {
+                            /* Recurse into a subdirectory */
+                            results = results.concat(getAllFiles(newPath));
+                        } else {
+                            /* Is a file */
+                            results.push({
+                                path: newPath.replace(/\\/g, '/'),
+                                content: readFileSync(newPath),
+                                mtime: stat.mtime
+                            });
+                        }
+                    });
+
+                    return results;
+                };
+
+                const files = getAllFiles(sourcePath);
+
+                client.pinFolderToIPFS(files, options)
+                    .then(resolve)
+                    .catch(reject);
+            }
+        });
     });
-}
+};

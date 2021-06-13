@@ -32,12 +32,12 @@ module.exports = function extendPin(client, privateKey, hostingContractAddress, 
 
                                     const sendReceipt = (txHash) => {
                                         waitForReceipt(client, txHash)
-                                            .then((result) => {
+                                            .then((txResult) => {
                                                 resolve({
-                                                    ethoTxHash: result.transactionHash,
-                                                    extensionCost,
-                                                    initiationBlock: result.blockNumber,
-                                                    expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                    ethoTxHash: txResult.transactionHash,
+                                                    extensionCost: extensionCost,
+                                                    initiationBlock: txResult.blockNumber,
+                                                    expirationBlock: (txResult.blockNumber + options.ethofsOptions.hostingContractDuration)
                                                 });
                                             })
                                             .catch(reject);

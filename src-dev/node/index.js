@@ -33,7 +33,17 @@ const prompt = function () {
                     }
                 ])
                 .then(async ({ params }) => {
-                    const paramsArray = params.split('--').map((i) => i.trim());
+                    const paramsArray = params.split('--')
+                        .map((i) => i.trim())
+                        .map((i) => {
+                            let ret;
+                            try {
+                                ret = JSON.parse(i);
+                            } catch {
+                                ret = i;
+                            }
+                            return ret;
+                        });
 
                     paramsArray.splice(0, 1);
 

@@ -28,9 +28,9 @@ module.exports = function unpin(client, privateKey, hostingContractAddress) {
 
                             const sendReceipt = (txHash) => {
                                 waitForReceipt(client, txHash)
-                                    .then((result) => {
+                                    .then((txResult) => {
                                         resolve({
-                                            ethoTxHash: result.transactionHash
+                                            ethoTxHash: txResult.transactionHash
                                         });
                                     })
                                     .catch(reject);

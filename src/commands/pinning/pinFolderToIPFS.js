@@ -44,14 +44,14 @@ module.exports = function pinFolderToIPFS(client, privateKey, readStream, option
 
                                     const sendReceipt = (txHash) => {
                                         waitForReceipt(client, txHash)
-                                            .then((result) => {
-                                                resolve(Object.assign(result, {
-                                                    ethoTxHash: result.transactionHash,
+                                            .then((txResult) => {
+                                                resolve({
+                                                    ethoTxHash: txResult.transactionHash,
                                                     ipfsHash: bs58.encode(result.cid.multihash),
                                                     uploadCost: uploadCost,
-                                                    initiationBlock: result.blockNumber,
-                                                    expirationBlock: (result.blockNumber + options.ethofsOptions.hostingContractDuration)
-                                                }));
+                                                    initiationBlock: txResult.blockNumber,
+                                                    expirationBlock: (txResult.blockNumber + options.ethofsOptions.hostingContractDuration)
+                                                });
                                             })
                                             .catch(reject);
                                     };

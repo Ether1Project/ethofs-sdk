@@ -3,9 +3,9 @@ module.exports = function signAndSendTx(client, tx, privateKey) {
         client.web3.eth.accounts.signTransaction(tx, privateKey)
             .then((signedTransactionData) => {
                 client.web3.eth.sendSignedTransaction(signedTransactionData.rawTransaction)
-                    .then((result) => {
-                        if (result.status) resolve(result.transactionHash);
-                        else reject(new Error(`There was an unknown Error sending signed TX. Hash: ${result.transactionHash}`));
+                    .then((txResult) => {
+                        if (txResult.status) resolve(txResult.transactionHash);
+                        else reject(new Error(`There was an unknown Error sending signed TX. Hash: ${txResult.transactionHash}`));
                     })
                     .catch(reject);
             })

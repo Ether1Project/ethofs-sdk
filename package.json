@@ -7,6 +7,7 @@
     "build-web": "webpack --env mode=production",
     "dev-web": "webpack serve --env mode=development",
     "dev-node": "node ./src-dev/node/index.js",
+    "dev-examples": "node ./src-dev/node/examples.js",
     "html": "open coverage/index.html",
     "lint": "eslint src --quiet ",
     "lint:fix": "eslint src --fix",

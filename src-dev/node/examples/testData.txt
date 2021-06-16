@@ -1,0 +1,15 @@
+pinListFilter:
+{"ethofsDataFilter":{"name":"Test Contract","keyvalues":{"customKey":"customValue","customKey2":"customValue2"}}}
+
+pinOptions:
+
+{"ethofsData":{"name":"Test Contract","keyvalues":{"customKey":"customValue","customKey2":"customValue2"}},"ethofsOptions":{"hostingContractDuration":100000,"hostingContractSize":20000000}}
+
+extendPin:
+{"ethofsOptions":{"hostingContractDuration":100000}}
+
+calculateCost:
+{"ethofsOptions":{"hostingContractDuration":100000,"hostingContractSize":20000000}}
+
+sendEther:
+{"to":"0x23dc032410772fE74b51C708B5A4A8ED7e41B05b","value":0.1}

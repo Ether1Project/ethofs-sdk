@@ -329,11 +329,11 @@ ethofs.pinFromFS(sourceDirectory, options).then((result) => {
 ```
 <a name="extendPin-anchor"></a>
 ### `extendPin`
-Have ethoFS unpin content that you've pinned/uploaded through the platform.
+Have ethoFS extend expiration blocktime of content that you've pinned/uploaded through the platform.
 
 ##### `ethofs.extendPin(uploadContractAddress, options)`
 ##### Params
-* `uploadContractAddress` - the upload contract address of the content you wish to remove from ethoFS
+* `uploadContractAddress` - the upload contract address of the content you wish to extend expiration blocktime with on ethoFS
 * `options` : A JSON object that contains the following keyvalues:
   * `ethofsOptions` : A JSON object with (#ethofsOptions-anchor) for the data being extended
 #### Response

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default function nodeLocations() {
 
-    const endpoint = 'https://api.ether1.org/ethofsapi.php?api=node_locations';
+    const endpoint = 'https://api.ethoprotocol.com/ethofsapi.php?api=node_locations';
 
     return new Promise((resolve, reject) => {
         axios.get(endpoint).then(function (result) {

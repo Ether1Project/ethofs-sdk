@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export default function networkStats() {
 
-    const endpoint = 'https://api.ether1.org/ethofsapi.php?api=network_stats';
+    const endpoint = 'https://api.ethoprotocol.com/ethofsapi.php?api=network_stats';
 
     return new Promise((resolve, reject) => {
         axios.get(endpoint).then(function (result) {

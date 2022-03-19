@@ -119,8 +119,7 @@ Retrieve ethoFS Node Location Information.
 [
     {
         type: This is type of node (Gateway Node, Masternode, Service Node),
-        country: This is the country where node is located in,
-        city: This is the city where node is located in,
+        id: This is the unique node id,
         latitude: This is the latitude of node (geolocated by IP address),
         longitude: This is the longitude of node (geolocated by IP address)
     }

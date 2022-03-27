@@ -2,17 +2,17 @@
 <img src="https://github.com/Ether1Project/Ether-1-Branding/raw/master/PNG%20Logos/ethoProtocolBlack.png" width="200" />
 </div>
 
-# ethoFS SDK
+# Etho Protocol SDK
 
-Official NodeJS SDK for [ethoFS](https://ethoprotocol.com)
+Official NodeJS SDK for [Etho Protocol](https://ethoprotocol.com)
 
 ## Overview
 
-The ethoFS NodeJS SDK provides the quickest / easiest path for interacting with the [Etho Protocol Network](https://docs.ethoprotocol.com/ethofs/ethofs-introduction).
+The Etho Protocol NodeJS SDK provides the quickest / easiest path for interacting with the [Etho Protocol Network](https://docs.ethoprotocol.com/ethofs/ethofs-introduction).
 
 ## Installation
 ```
-npm install --save @ethofs/sdk
+npm install --save @ethoprotocol/sdk
 ```
 
 ## Setup
@@ -20,12 +20,12 @@ To start, simply require the ethoFS SDK and set up an instance with your ethoFS 
 
 ## Initialization Without Authentication
 ```javascript
-const ethofsSDK = require('@ethofs/sdk');
+const ethofsSDK = require('@ethoprotocol/sdk');
 const ethofs = ethofsSDK();
 ```
 ## Initialization With Authentication
 ```javascript
-const ethofsSDK = require('@ethofs/sdk');
+const ethofsSDK = require('@ethoprotocol/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey');
 ```
 ## Initialization With Custom RPC/Gateway Locations
@@ -39,7 +39,7 @@ const connections = {
     rpc: 'https://rpc.ethoprotocol.com',
     gateway: 'https://gateway.ethoprotocol.com'
 };
-const ethofsSDK = require('@ethofs/sdk');
+const ethofsSDK = require('@ethoprotocol/sdk');
 const ethofs = ethofsSDK('yourETHOPrivateKey', connections);
 ```
 
@@ -109,7 +109,7 @@ ethofs.networkStats().then((result) => {
 ```
 <a name="nodeLocations-anchor"></a>
 ### `nodeLocations`
-Retrieve ethoFS Node Location Information.
+Retrieve Etho Protocol Node Location Information.
 
 ##### `ethofs.nodeLocations()`
 ##### Params

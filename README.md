@@ -328,7 +328,7 @@ ethofs.pinFromFS(sourceDirectory, options).then((result) => {
 ```
 <a name="extendPin-anchor"></a>
 ### `extendPin`
-Have ethoFS unpin content that you've pinned/uploaded through the platform.
+Have ethoFS extend content that you've pinned/uploaded through the platform.
 
 ##### `ethofs.extendPin(uploadContractAddress, options)`
 ##### Params
@@ -498,6 +498,6 @@ The options object can consist of the following values:
 ```
 
 ## Questions? Issues? Suggestions? 
-Feel free to file a github issue or email us at admin@ether1.org 
+Feel free to file a github issue or email us at admin@ethoprotocol.com
 
 We'd love to hear from you!
